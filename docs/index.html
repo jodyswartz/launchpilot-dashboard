@@ -550,9 +550,10 @@
             </div>
             <nav aria-label="Dashboard sections">
               <a href="#workflows">Workflows</a>
-              <a href="#activity">Activity</a>
-              <a href="#review">Needs Review</a>
-              <a href="#controls">Controls</a>
+              <a href="#tasks">Tasks</a>
+              <a href="#prs">PRs</a>
+              <a href="#logs">Logs</a>
+              <a href="#cleanup">Cleanup</a>
             </nav>
           </header>
 
@@ -664,23 +665,24 @@
           </div>
         </section>
 
-        <section class="section" id="activity">
+        <section class="section" id="tasks">
           <div class="section-head">
             <div>
-              <h2>Recent Activity</h2>
-              <p>Sample events shown for dashboard layout and operator scanning.</p>
+              <h2>Recent Tasks</h2>
+              <p>Sample task queue shown for dashboard layout and operator scanning.</p>
             </div>
+            <span class="badge">Sample data</span>
           </div>
 
           <div class="grid-3">
             <article class="card">
               <div class="card-head">
-                <h3>Telegram idea accepted</h3>
+                <h3>Task #28: Dashboard</h3>
                 <span class="chip green">running</span>
               </div>
               <p>LaunchPilot started a dashboard polish branch for <code>jodyswartz/launchpilot-dashboard</code>.</p>
               <div class="meta">
-                <span class="chip">LP-027</span>
+                <span class="chip">LP-028</span>
                 <span class="chip">docs</span>
                 <span class="chip">2m ago</span>
               </div>
@@ -688,7 +690,7 @@
 
             <article class="card">
               <div class="card-head">
-                <h3>Issue label detected</h3>
+                <h3>Task #27: Landing copy</h3>
                 <span class="chip amber">queued</span>
               </div>
               <p>S.A.G.E. queued issue #118 after the <code>sage:ready</code> label was applied.</p>
@@ -701,7 +703,7 @@
 
             <article class="card">
               <div class="card-head">
-                <h3>PR checks passed</h3>
+                <h3>Task #26: Check wiring</h3>
                 <span class="chip green">ready</span>
               </div>
               <p>Automated tests and static checks completed for a LaunchPilot branch.</p>
@@ -714,12 +716,55 @@
           </div>
         </section>
 
-        <section class="section" id="review">
+        <section class="section" id="status">
+          <div class="section-head">
+            <div>
+              <h2>Task Status</h2>
+              <p>Read-only progress markers for active, queued, and completed automation work.</p>
+            </div>
+          </div>
+
+          <article class="table-card">
+            <h3>Status Board</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Task</th>
+                  <th>Owner</th>
+                  <th>Status</th>
+                  <th>Next Check</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Task #28: Add Mission Control dashboard</td>
+                  <td>LaunchPilot</td>
+                  <td><span class="chip green">building</span></td>
+                  <td>Static HTML review</td>
+                </tr>
+                <tr>
+                  <td>Task #27: Refresh landing copy</td>
+                  <td>LaunchPilot</td>
+                  <td><span class="chip amber">waiting</span></td>
+                  <td>Owner approval</td>
+                </tr>
+                <tr>
+                  <td>Issue #118: Add billing guard copy</td>
+                  <td>S.A.G.E.</td>
+                  <td><span class="chip">queued</span></td>
+                  <td>Label confirmation</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+        </section>
+
+        <section class="section" id="prs">
           <div class="grid-2">
             <article class="card">
               <div class="section-head">
                 <div>
-                  <h2>Needs Review</h2>
+                  <h2>PR and Merge Status</h2>
                   <p>Human approval remains required before merge or deployment.</p>
                 </div>
               </div>
@@ -731,6 +776,7 @@
                   <div class="meta">
                     <span class="chip green">LaunchPilot</span>
                     <span class="chip">docs/index.html</span>
+                    <span class="chip amber">merge blocked</span>
                   </div>
                 </div>
                 <div class="actions" aria-label="Read-only review actions">
@@ -748,6 +794,7 @@
                   <div class="meta">
                     <span class="chip green">S.A.G.E.</span>
                     <span class="chip amber">review</span>
+                    <span class="chip">no PR yet</span>
                   </div>
                 </div>
                 <div class="actions" aria-label="Read-only review actions">
@@ -761,18 +808,18 @@
 
             <article class="card">
               <h2>Deployment Links</h2>
-              <p>Static targets for operators to jump into review surfaces.</p>
+              <p>Static targets for operators to jump into preview and production surfaces.</p>
               <div class="links" aria-label="Deployment links">
-                <a class="deploy-link" href="#review">
+                <a class="deploy-link" href="#prs">
                   <strong>GitHub Pages Preview</strong>
                   <span>docs build</span>
                 </a>
-                <a class="deploy-link" href="#activity">
-                  <strong>Actions Run Log</strong>
-                  <span>latest checks</span>
+                <a class="deploy-link" href="#logs">
+                  <strong>Vercel Preview</strong>
+                  <span>sample link</span>
                 </a>
                 <a class="deploy-link" href="#workflows">
-                  <strong>Production Dashboard</strong>
+                  <strong>GitHub Pages Production</strong>
                   <span>read-only</span>
                 </a>
               </div>
@@ -780,55 +827,93 @@
           </div>
         </section>
 
-        <section class="section" id="controls">
+        <section class="section" id="logs">
           <div class="section-head">
             <div>
-              <h2>Repos, Labels, and Safety Controls</h2>
+              <h2>Latest Logs</h2>
+              <p>Representative run output for quick triage. The static dashboard does not stream live logs.</p>
+            </div>
+          </div>
+
+          <article class="table-card">
+            <h3>Run Log</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Source</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>09:42 UTC</td>
+                  <td>LaunchPilot</td>
+                  <td>Task #28 workspace prepared; protected files skipped.</td>
+                </tr>
+                <tr>
+                  <td>09:45 UTC</td>
+                  <td>Checks</td>
+                  <td>Static page diff ready for review.</td>
+                </tr>
+                <tr>
+                  <td>09:51 UTC</td>
+                  <td>Deploy</td>
+                  <td>GitHub Pages preview awaiting merge.</td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
+        </section>
+
+        <section class="section" id="cleanup">
+          <div class="section-head">
+            <div>
+              <h2>Workspace Cleanup</h2>
               <p>
-                Automation only runs against approved repositories and supported
-                labels. Controls are visible here as operator affordances, but
-                inactive in this static dashboard.
+                Sample cleanup checklist for keeping automation runs reviewable
+                and disposable after PR creation.
               </p>
             </div>
           </div>
 
           <div class="grid-2">
             <article class="table-card">
-              <h3>Whitelisted Repos</h3>
+              <h3>Cleanup Queue</h3>
               <table>
                 <thead>
                   <tr>
-                    <th>Repository</th>
-                    <th>Agent</th>
-                    <th>Access</th>
+                    <th>Workspace</th>
+                    <th>Cleanup</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>jodyswartz/launchpilot-dashboard</td>
-                    <td>LaunchPilot, S.A.G.E.</td>
-                    <td><span class="chip green">docs + PRs</span></td>
+                    <td><code>task-28</code></td>
+                    <td>Keep branch until PR review completes.</td>
+                    <td><span class="chip amber">hold</span></td>
                   </tr>
                   <tr>
-                    <td>jodyswartz/launchpilot-app</td>
-                    <td>LaunchPilot</td>
-                    <td><span class="chip">feature branches</span></td>
+                    <td><code>task-27</code></td>
+                    <td>Archive logs after merge.</td>
+                    <td><span class="chip">pending</span></td>
                   </tr>
                   <tr>
-                    <td>jodyswartz/sage-automation</td>
-                    <td>S.A.G.E.</td>
-                    <td><span class="chip">labeled issues</span></td>
+                    <td><code>sage-118</code></td>
+                    <td>Remove temporary branch if issue label is cleared.</td>
+                    <td><span class="chip green">ready</span></td>
                   </tr>
                 </tbody>
               </table>
             </article>
 
             <article class="table-card">
-              <h3>Supported Labels</h3>
+              <h3>Approved Repos and Labels</h3>
               <table>
                 <thead>
                   <tr>
-                    <th>Label</th>
+                    <th>Control</th>
                     <th>Purpose</th>
                     <th>Agent</th>
                   </tr>
