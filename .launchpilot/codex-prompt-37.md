@@ -1,0 +1,3 @@
+Task #37: Improve the existing index.html Mission Control dashboard to better match the current LaunchPilot workflow. Update the LaunchPilot lane to show five steps: Telegram idea, Codex build, GitHub PR, Approve and merge, and Open website. Make it clear the dashboard is read-only and that actions happen in Telegram. Add cancelled tasks to the top metrics, update the S.A.G.E. labels to sage-fix and sage-small, and make the review/merge/deployment copy match the current flow where LaunchPilot can merge a PR and then show a Vercel or GitHub Pages website link. Keep the existing design style and mobile responsiveness.
+
+Make the smallest useful change. Do not edit secrets, .env files, SSH keys, or deployment tokens. Do not make unrelated refactors.
