@@ -570,7 +570,7 @@
 
             <aside class="status-panel" aria-label="Current mission status">
               <h2>Today at a glance</h2>
-              <div class="metric-grid">
+              <div class="metric-grid" id="metric-grid">
                 <div class="metric">
                   <strong>08</strong>
                   <span>active runs</span>
@@ -680,12 +680,12 @@
           <div class="section-head">
             <div>
               <h2>Recent Tasks</h2>
-              <p>Sample task queue shown for dashboard layout and operator scanning.</p>
+              <p>Task queue shown for dashboard layout and operator scanning.</p>
             </div>
-            <span class="badge">Sample data</span>
+            <span class="badge">Dashboard data</span>
           </div>
 
-          <div class="grid-3">
+          <div class="grid-3" id="recent-tasks">
             <article class="card">
               <div class="card-head">
                 <h3>Task #28: Dashboard</h3>
@@ -746,7 +746,7 @@
                   <th>Next Check</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="status-board">
                 <tr>
                   <td>Task #28: Add Mission Control dashboard</td>
                   <td>LaunchPilot</td>
@@ -780,39 +780,41 @@
                 </div>
               </div>
 
-              <div class="review-item">
-                <div>
-                  <h3>PR #42: Mission Control dashboard</h3>
-                  <p>Docs-only static page, no runtime secrets, waiting for Telegram approval before LaunchPilot merges.</p>
-                  <div class="meta">
-                    <span class="chip green">LaunchPilot</span>
-                    <span class="chip">docs/index.html</span>
-                    <span class="chip amber">awaiting approval</span>
+              <div id="needs-review">
+                <div class="review-item">
+                  <div>
+                    <h3>PR #42: Mission Control dashboard</h3>
+                    <p>Docs-only static page, no runtime secrets, waiting for Telegram approval before LaunchPilot merges.</p>
+                    <div class="meta">
+                      <span class="chip green">LaunchPilot</span>
+                      <span class="chip">docs/index.html</span>
+                      <span class="chip amber">awaiting approval</span>
+                    </div>
+                  </div>
+                  <div class="actions" aria-label="Read-only review actions">
+                    <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
+                    <button class="button danger" type="button" aria-disabled="true" disabled>Cancel in Telegram</button>
+                    <button class="button primary" type="button" aria-disabled="true" disabled>Approve in Telegram</button>
+                    <button class="button" type="button" aria-disabled="true" disabled>Merge in Telegram</button>
                   </div>
                 </div>
-                <div class="actions" aria-label="Read-only review actions">
-                  <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
-                  <button class="button danger" type="button" aria-disabled="true" disabled>Cancel in Telegram</button>
-                  <button class="button primary" type="button" aria-disabled="true" disabled>Approve in Telegram</button>
-                  <button class="button" type="button" aria-disabled="true" disabled>Merge in Telegram</button>
-                </div>
-              </div>
 
-              <div class="review-item">
-                <div>
-                  <h3>Issue #118: Add billing guard copy</h3>
-                  <p>S.A.G.E. draft waiting for owner review after <code>sage-small</code> triage.</p>
-                  <div class="meta">
-                    <span class="chip green">S.A.G.E.</span>
-                    <span class="chip amber">review</span>
-                    <span class="chip">sage-small</span>
+                <div class="review-item">
+                  <div>
+                    <h3>Issue #118: Add billing guard copy</h3>
+                    <p>S.A.G.E. draft waiting for owner review after <code>sage-small</code> triage.</p>
+                    <div class="meta">
+                      <span class="chip green">S.A.G.E.</span>
+                      <span class="chip amber">review</span>
+                      <span class="chip">sage-small</span>
+                    </div>
                   </div>
-                </div>
-                <div class="actions" aria-label="Read-only review actions">
-                  <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
-                  <button class="button danger" type="button" aria-disabled="true" disabled>Cancel in Telegram</button>
-                  <button class="button primary" type="button" aria-disabled="true" disabled>Approve in Telegram</button>
-                  <button class="button" type="button" aria-disabled="true" disabled>Merge in Telegram</button>
+                  <div class="actions" aria-label="Read-only review actions">
+                    <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
+                    <button class="button danger" type="button" aria-disabled="true" disabled>Cancel in Telegram</button>
+                    <button class="button primary" type="button" aria-disabled="true" disabled>Approve in Telegram</button>
+                    <button class="button" type="button" aria-disabled="true" disabled>Merge in Telegram</button>
+                  </div>
                 </div>
               </div>
             </article>
@@ -820,7 +822,7 @@
             <article class="card">
               <h2>Deployment Links</h2>
               <p>After approval, LaunchPilot can merge the PR and post the live Vercel or GitHub Pages website link.</p>
-              <div class="links" aria-label="Deployment links">
+              <div class="links" id="deployment-links" aria-label="Deployment links">
                 <a class="deploy-link" href="#review">
                   <strong>GitHub Pages Preview</strong>
                   <span>website link</span>
@@ -842,7 +844,7 @@
           <div class="section-head">
             <div>
               <h2>Latest Logs</h2>
-              <p>Representative run output for quick triage. The static dashboard does not stream live logs.</p>
+              <p>Run output for quick triage. The dashboard loads logs from JSON when available.</p>
             </div>
           </div>
 
@@ -856,7 +858,7 @@
                   <th>Message</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="latest-logs">
                 <tr>
                   <td>09:42 UTC</td>
                   <td>LaunchPilot</td>
@@ -882,8 +884,8 @@
             <div>
               <h2>Workspace Cleanup</h2>
               <p>
-                Sample cleanup checklist for keeping automation runs reviewable
-                and disposable after PR creation.
+                Cleanup checklist for keeping automation runs reviewable and
+                disposable after PR creation.
               </p>
             </div>
           </div>
@@ -899,7 +901,7 @@
                     <th>Status</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="cleanup-queue">
                   <tr>
                     <td><code>task-28</code></td>
                     <td>Keep branch until PR review completes.</td>
@@ -929,7 +931,7 @@
                     <th>Agent</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="whitelisted-repos">
                   <tr>
                     <td><code>jodyswartz/launchpilot-dashboard</code></td>
                     <td>Docs, dashboard UI, and GitHub Pages previews.</td>
@@ -959,7 +961,7 @@
                     <th>Agent</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="supported-labels">
                   <tr>
                     <td><span class="chip green">sage-fix</span></td>
                     <td>Queue an approved bug fix for implementation.</td>
@@ -994,7 +996,7 @@
                     <th>Cleanup</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="cancelled-tasks">
                   <tr>
                     <td><code>LP-025</code></td>
                     <td>Repo was not on the whitelist.</td>
@@ -1036,8 +1038,290 @@
       </main>
 
       <footer class="wrap">
-        LaunchPilot Mission Control is a static dashboard mockup for GitHub Pages.
+        LaunchPilot Mission Control is a static dashboard for GitHub Pages.
       </footer>
     </div>
+    <script>
+      (() => {
+        const DATA_URL = "dashboard/tasks.json";
+        const statusClass = (value = "") => {
+          const text = String(value).toLowerCase();
+          if (/(ready|running|building|merged|open|complete|archived|allowed|success)/.test(text)) {
+            return " green";
+          }
+          if (/(waiting|queued|review|hold|pending|needs|blocked)/.test(text)) {
+            return " amber";
+          }
+          if (/(cancel|failed|error|denied|removed)/.test(text)) {
+            return " red";
+          }
+          return "";
+        };
+        const escape = (value = "") =>
+          String(value).replace(/[&<>"']/g, (char) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[char]);
+        const code = (value = "") => `<code>${escape(value)}</code>`;
+        const chip = (value = "", extra = "") =>
+          `<span class="chip${extra || statusClass(value)}">${escape(value)}</span>`;
+        const asArray = (value) => Array.isArray(value) ? value : [];
+        const firstValue = (data, names) => {
+          for (const name of names) {
+            if (Object.prototype.hasOwnProperty.call(data, name)) {
+              return { found: true, value: data[name] };
+            }
+          }
+          return { found: false, value: undefined };
+        };
+        const setHTML = (id, html) => {
+          const node = document.getElementById(id);
+          if (node) node.innerHTML = html;
+        };
+        const emptyCards = (text) => `<article class="card"><p>${escape(text)}</p></article>`;
+        const emptyRows = (colspan = 3, text = "No items to show.") =>
+          `<tr><td colspan="${colspan}">${escape(text)}</td></tr>`;
+        const safeHref = (href = "#") => {
+          const value = String(href || "#").trim();
+          return /^(https?:\/\/|#|\.?\/)/.test(value) ? value : "#";
+        };
+        const taskStatus = (task) => String(task.status ?? task.state ?? "").toLowerCase();
+        const taskId = (task) => task.displayId ?? task.display_id ?? task.key ?? task.id ?? "";
+        const taskTitle = (task) => typeof task === "string"
+          ? task
+          : task.title ?? task.name ?? (taskId(task) ? `Task ${taskId(task)}` : "Untitled task");
+        const normalizeDashboard = (raw) => {
+          const data = Array.isArray(raw) ? { tasks: raw } : { ...(raw || {}) };
+          const tasks = asArray(data.tasks);
+          if (!tasks.length) return data;
+          const has = (names) => names.some((name) => Object.prototype.hasOwnProperty.call(data, name));
+          const taskCount = (pattern) => tasks.filter((task) => pattern.test(taskStatus(task))).length;
+
+          if (!has(["metrics", "topMetrics", "top_metrics"])) {
+            data.metrics = [
+              { value: taskCount(/active|running|building|started/), label: "active runs" },
+              { value: taskCount(/review|approval|waiting/), label: "waiting for review" },
+              { value: tasks.filter((task) => task.pr || task.prUrl || task.pr_url || task.pullRequest).length, label: "PRs opened this week" },
+              { value: taskCount(/cancel/), label: "cancelled tasks" },
+              { value: taskCount(/blocked/), label: "blocked deployments" },
+            ];
+          }
+          if (!has(["recentTasks", "recent_tasks"])) {
+            data.recentTasks = tasks.slice(0, 3);
+          }
+          if (!has(["statusBoard", "status_board", "statuses"])) {
+            data.statusBoard = tasks.map((task) => ({
+              task: taskTitle(task),
+              owner: task.owner ?? task.agent ?? task.source,
+              status: task.status ?? task.state,
+              nextCheck: task.nextCheck ?? task.next_check ?? task.next,
+            }));
+          }
+          if (!has(["needsReview", "needs_review", "reviews"])) {
+            data.needsReview = tasks.filter((task) => /review|approval|waiting/.test(taskStatus(task)));
+          }
+          if (!has(["deploymentLinks", "deployment_links", "deployments"])) {
+            data.deploymentLinks = tasks.flatMap((task) => {
+              const links = task.deploymentLinks ?? task.deployment_links ?? task.deployments ?? [];
+              if (Array.isArray(links) && links.length) return links;
+              return [task.previewUrl ?? task.preview_url, task.deployUrl ?? task.deploy_url, task.url]
+                .filter(Boolean)
+                .map((url) => ({ title: taskTitle(task), url, label: "website link" }));
+            });
+          }
+          if (!has(["latestLogs", "latest_logs", "logs"])) {
+            data.latestLogs = tasks.flatMap((task) => {
+              const logs = asArray(task.logs);
+              if (logs.length) return logs;
+              return task.latestLog || task.latest_log
+                ? [{ time: task.updatedAt ?? task.updated_at ?? "", source: task.agent ?? task.owner ?? "", message: task.latestLog ?? task.latest_log }]
+                : [];
+            }).slice(0, 8);
+          }
+          if (!has(["cleanupQueue", "cleanup_queue", "cleanup"])) {
+            data.cleanupQueue = tasks
+              .filter((task) => task.cleanup || task.workspace)
+              .map((task) => ({
+                workspace: task.workspace ?? taskId(task),
+                cleanup: task.cleanup ?? "Track workspace until review closes.",
+                status: task.cleanupStatus ?? task.cleanup_status ?? task.status,
+              }));
+          }
+          if (!has(["cancelledTasks", "cancelled_tasks", "cancelled"])) {
+            data.cancelledTasks = tasks
+              .filter((task) => /cancel/.test(taskStatus(task)))
+              .map((task) => ({
+                task: taskId(task) || taskTitle(task),
+                reason: task.reason ?? task.cancelReason ?? task.cancel_reason ?? "",
+                cleanup: task.cleanup ?? task.cleanupStatus ?? task.cleanup_status ?? "pending",
+              }));
+          }
+          return data;
+        };
+
+        const renderMetrics = (value) => {
+          const metrics = Array.isArray(value)
+            ? value
+            : Object.entries(value || {}).map(([label, metricValue]) => ({ label, value: metricValue }));
+          setHTML("metric-grid", metrics.map((metric) => `
+            <div class="metric">
+              <strong>${escape(metric.value ?? metric.count ?? "0")}</strong>
+              <span>${escape(metric.label ?? metric.name ?? "")}</span>
+            </div>
+          `).join("") || emptyCards("No metrics available."));
+        };
+
+        const renderRecentTasks = (tasks) => {
+          setHTML("recent-tasks", asArray(tasks).map((task) => `
+            <article class="card">
+              <div class="card-head">
+                <h3>${escape(taskTitle(task))}</h3>
+                ${chip(task.status ?? task.state ?? "unknown")}
+              </div>
+              <p>${escape(task.description ?? task.summary ?? "")}</p>
+              <div class="meta">
+                ${(asArray(task.meta ?? task.tags).length
+                  ? asArray(task.meta ?? task.tags)
+                  : [taskId(task), task.repo ?? task.repository, task.updatedAt ?? task.updated_at].filter(Boolean)
+                ).map((item) => chip(item)).join("")}
+              </div>
+            </article>
+          `).join("") || emptyCards("No recent tasks."));
+        };
+
+        const renderStatusBoard = (tasks) => {
+          setHTML("status-board", asArray(tasks).map((task) => `
+            <tr>
+              <td>${escape(task.task ?? task.title ?? task.name ?? "Untitled task")}</td>
+              <td>${escape(task.owner ?? task.agent ?? "")}</td>
+              <td>${chip(task.status ?? "unknown")}</td>
+              <td>${escape(task.nextCheck ?? task.next_check ?? task.next ?? "")}</td>
+            </tr>
+          `).join("") || emptyRows(4, "No status updates."));
+        };
+
+        const renderReviews = (reviews) => {
+          setHTML("needs-review", asArray(reviews).map((item) => `
+            <div class="review-item">
+              <div>
+                <h3>${escape(taskTitle(item))}</h3>
+                <p>${escape(item.description ?? item.summary ?? "")}</p>
+                <div class="meta">
+                  ${(asArray(item.meta ?? item.tags).length
+                    ? asArray(item.meta ?? item.tags)
+                    : [item.agent ?? item.owner, item.repo ?? item.repository, item.status ?? item.state].filter(Boolean)
+                  ).map((entry) => chip(entry)).join("")}
+                </div>
+              </div>
+              <div class="actions" aria-label="Read-only review actions">
+                <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
+                <button class="button danger" type="button" aria-disabled="true" disabled>Cancel in Telegram</button>
+                <button class="button primary" type="button" aria-disabled="true" disabled>Approve in Telegram</button>
+                <button class="button" type="button" aria-disabled="true" disabled>Merge in Telegram</button>
+              </div>
+            </div>
+          `).join("") || '<p>No tasks currently need review.</p>');
+        };
+
+        const renderDeploymentLinks = (links) => {
+          setHTML("deployment-links", asArray(links).map((link) => {
+            const item = link && typeof link === "object" ? link : { url: link ?? "", title: link ?? "Deployment" };
+            return `
+            <a class="deploy-link" href="${escape(safeHref(item.href ?? item.url))}">
+              <strong>${escape(item.title ?? item.name ?? "Deployment")}</strong>
+              <span>${escape(item.label ?? item.status ?? item.description ?? "website link")}</span>
+            </a>
+          `;
+          }).join("") || '<p>No deployment links available.</p>');
+        };
+
+        const renderLogs = (logs) => {
+          setHTML("latest-logs", asArray(logs).map((log) => `
+            <tr>
+              <td>${escape(log.time ?? log.timestamp ?? "")}</td>
+              <td>${escape(log.source ?? log.agent ?? "")}</td>
+              <td>${escape(log.message ?? log.text ?? "")}</td>
+            </tr>
+          `).join("") || emptyRows(3, "No logs available."));
+        };
+
+        const renderCleanup = (items) => {
+          setHTML("cleanup-queue", asArray(items).map((item) => `
+            <tr>
+              <td>${code(item.workspace ?? item.task ?? item.id ?? "")}</td>
+              <td>${escape(item.cleanup ?? item.description ?? "")}</td>
+              <td>${chip(item.status ?? "")}</td>
+            </tr>
+          `).join("") || emptyRows(3, "No cleanup queued."));
+        };
+
+        const renderRepos = (repos) => {
+          setHTML("whitelisted-repos", asArray(repos).map((repo) => {
+            const item = repo && typeof repo === "object" ? repo : { repository: repo ?? "" };
+            return `
+              <tr>
+                <td>${code(item.repository ?? item.repo ?? item.name ?? "")}</td>
+                <td>${escape(item.allowedWork ?? item.allowed_work ?? item.description ?? "")}</td>
+                <td>${escape(item.agent ?? "Both")}</td>
+              </tr>
+            `;
+          }).join("") || emptyRows(3, "No repositories whitelisted."));
+        };
+
+        const renderLabels = (labels) => {
+          setHTML("supported-labels", asArray(labels).map((label) => {
+            const item = label && typeof label === "object" ? label : { control: label ?? "" };
+            return `
+              <tr>
+                <td>${chip(item.control ?? item.label ?? item.name ?? "")}</td>
+                <td>${escape(item.purpose ?? item.description ?? "")}</td>
+                <td>${escape(item.agent ?? "")}</td>
+              </tr>
+            `;
+          }).join("") || emptyRows(3, "No supported labels configured."));
+        };
+
+        const renderCancelled = (tasks) => {
+          setHTML("cancelled-tasks", asArray(tasks).map((task) => `
+            <tr>
+              <td>${code(task.task ?? task.id ?? task.title ?? "")}</td>
+              <td>${escape(task.reason ?? task.description ?? "")}</td>
+              <td>${chip(task.cleanup ?? task.status ?? "")}</td>
+            </tr>
+          `).join("") || emptyRows(3, "No cancelled tasks."));
+        };
+
+        const renderIfPresent = (data, names, render) => {
+          const result = firstValue(data, names);
+          if (result.found) render(result.value);
+        };
+
+        fetch(DATA_URL, { cache: "no-store" })
+          .then((response) => {
+            if (!response.ok) throw new Error(`Unable to load ${DATA_URL}`);
+            return response.json();
+          })
+          .then((data) => {
+            data = data.dashboard || data;
+            data = normalizeDashboard(data);
+            renderIfPresent(data, ["metrics", "topMetrics", "top_metrics"], renderMetrics);
+            renderIfPresent(data, ["recentTasks", "recent_tasks", "tasks"], renderRecentTasks);
+            renderIfPresent(data, ["statusBoard", "status_board", "statuses"], renderStatusBoard);
+            renderIfPresent(data, ["needsReview", "needs_review", "reviews"], renderReviews);
+            renderIfPresent(data, ["deploymentLinks", "deployment_links", "deployments"], renderDeploymentLinks);
+            renderIfPresent(data, ["latestLogs", "latest_logs", "logs"], renderLogs);
+            renderIfPresent(data, ["cleanupQueue", "cleanup_queue", "cleanup"], renderCleanup);
+            renderIfPresent(data, ["whitelistedRepos", "whitelisted_repos", "repos"], renderRepos);
+            renderIfPresent(data, ["supportedLabels", "supported_labels", "labels"], renderLabels);
+            renderIfPresent(data, ["cancelledTasks", "cancelled_tasks", "cancelled"], renderCancelled);
+          })
+          .catch(() => {
+            // Keep the static sample dashboard intact when Pages cannot load JSON.
+          });
+      })();
+    </script>
   </body>
 </html>

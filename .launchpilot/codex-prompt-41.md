@@ -1,0 +1,3 @@
+Task #41: Convert the existing index.html Mission Control dashboard into a real GitHub Pages-compatible dashboard that reads data from dashboard/tasks.json. Use fetch() to load the JSON, then populate the top metrics, Recent Tasks, Status Board, Needs Review, Deployment Links, Latest Logs, Cleanup Queue, Whitelisted Repos, Supported Labels, and Cancelled Tasks. Keep the current static sample content as a fallback if dashboard/tasks.json cannot be loaded. Preserve the current design style and responsive layout.
+
+Make the smallest useful change. Do not edit secrets, .env files, SSH keys, or deployment tokens. Do not make unrelated refactors.
