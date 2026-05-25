@@ -1,0 +1,3 @@
+Task #30: Move the GitHub Pages dashboard from docs/index.html to the repo root as index.html. Preserve the existing page content and styling. Update any relative asset paths if needed. Remove docs/index.html after moving it, and update README.md to explain that the dashboard is now served from the repository root instead of the docs folder.
+
+Make the smallest useful change. Do not edit secrets, .env files, SSH keys, or deployment tokens. Do not make unrelated refactors.
