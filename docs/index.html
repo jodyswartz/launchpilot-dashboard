@@ -462,7 +462,7 @@
 
       .safety-list {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: 12px;
       }
 
@@ -551,7 +551,7 @@
             <nav aria-label="Dashboard sections">
               <a href="#workflows">Workflows</a>
               <a href="#tasks">Tasks</a>
-              <a href="#prs">PRs</a>
+              <a href="#review">Needs Review</a>
               <a href="#logs">Logs</a>
               <a href="#cleanup">Cleanup</a>
             </nav>
@@ -759,12 +759,12 @@
           </article>
         </section>
 
-        <section class="section" id="prs">
+        <section class="section" id="review">
           <div class="grid-2">
             <article class="card">
               <div class="section-head">
                 <div>
-                  <h2>PR and Merge Status</h2>
+                  <h2>Needs Review</h2>
                   <p>Human approval remains required before merge or deployment.</p>
                 </div>
               </div>
@@ -810,7 +810,7 @@
               <h2>Deployment Links</h2>
               <p>Static targets for operators to jump into preview and production surfaces.</p>
               <div class="links" aria-label="Deployment links">
-                <a class="deploy-link" href="#prs">
+                <a class="deploy-link" href="#review">
                   <strong>GitHub Pages Preview</strong>
                   <span>docs build</span>
                 </a>
@@ -909,7 +909,37 @@
             </article>
 
             <article class="table-card">
-              <h3>Approved Repos and Labels</h3>
+              <h3>Whitelisted Repos</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Repository</th>
+                    <th>Allowed Work</th>
+                    <th>Agent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>jodyswartz/launchpilot-dashboard</code></td>
+                    <td>Docs, dashboard UI, and GitHub Pages previews.</td>
+                    <td>LaunchPilot</td>
+                  </tr>
+                  <tr>
+                    <td><code>jodyswartz/sage-lab</code></td>
+                    <td>Labeled issue patches with owner review.</td>
+                    <td>S.A.G.E.</td>
+                  </tr>
+                  <tr>
+                    <td><code>jodyswartz/automation-playground</code></td>
+                    <td>Sandbox runs, test fixtures, and cleanup drills.</td>
+                    <td>Both</td>
+                  </tr>
+                </tbody>
+              </table>
+            </article>
+
+            <article class="table-card">
+              <h3>Supported Labels</h3>
               <table>
                 <thead>
                   <tr>
@@ -937,6 +967,31 @@
                 </tbody>
               </table>
             </article>
+
+            <article class="table-card">
+              <h3>Cancelled Tasks</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Task</th>
+                    <th>Reason</th>
+                    <th>Cleanup</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>LP-025</code></td>
+                    <td>Repo was not on the whitelist.</td>
+                    <td><span class="chip green">logs archived</span></td>
+                  </tr>
+                  <tr>
+                    <td><code>SAGE-116</code></td>
+                    <td>Required label was removed before patching.</td>
+                    <td><span class="chip">branch removed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </article>
           </div>
 
           <div class="safety-list section" aria-label="Safety controls">
@@ -955,6 +1010,10 @@
             <div class="safety">
               <strong>Merge</strong>
               <span>Read-only here; live merge remains inside GitHub review.</span>
+            </div>
+            <div class="safety">
+              <strong>Cleanup</strong>
+              <span>Temporary branches and logs stay tracked until review closes.</span>
             </div>
           </div>
         </section>
