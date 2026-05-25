@@ -149,7 +149,7 @@
 
       .metric-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
         gap: 12px;
       }
 
@@ -563,7 +563,8 @@
               <h1>LaunchPilot Mission Control</h1>
               <p>
                 A read-only dashboard for tracking AI-assisted idea-to-PR and
-                issue-to-PR automation across approved repositories.
+                issue-to-PR automation. Review, approve, cancel, and merge
+                actions happen in Telegram.
               </p>
             </div>
 
@@ -583,6 +584,10 @@
                   <span>PRs opened this week</span>
                 </div>
                 <div class="metric">
+                  <strong>02</strong>
+                  <span>cancelled tasks</span>
+                </div>
+                <div class="metric">
                   <strong>0</strong>
                   <span>blocked deployments</span>
                 </div>
@@ -599,8 +604,10 @@
               <h2>Two-Lane Workflow</h2>
               <p>
                 LaunchPilot turns Telegram product ideas into pull requests.
-                S.A.G.E. turns labeled GitHub issues into reviewed automation
-                runs.
+                S.A.G.E. turns <code>sage-fix</code> and
+                <code>sage-small</code> GitHub issues into reviewed automation
+                runs. This dashboard is read-only; commands are handled in
+                Telegram.
               </p>
             </div>
             <span class="badge">Read-only status</span>
@@ -611,26 +618,30 @@
               <div class="lane-title">
                 <div>
                   <h3>LaunchPilot</h3>
-                  <p>Telegram idea-to-PR builds</p>
+                  <p>Telegram idea-to-website builds</p>
                 </div>
                 <span class="badge">Idea Lane</span>
               </div>
               <div class="steps">
                 <div class="step">
                   <span class="step-number">1</span>
-                  <span><strong>Capture</strong>Telegram idea arrives with repo and branch context.</span>
+                  <span><strong>Telegram idea</strong>Idea arrives with repo and website context.</span>
                 </div>
                 <div class="step">
                   <span class="step-number">2</span>
-                  <span><strong>Plan</strong>Agent scopes files, confirms guardrails, and drafts work.</span>
+                  <span><strong>Codex build</strong>Codex scopes files, applies guardrails, and builds the change.</span>
                 </div>
                 <div class="step">
                   <span class="step-number">3</span>
-                  <span><strong>Build</strong>Changes are made in a task branch with logs attached.</span>
+                  <span><strong>GitHub PR</strong>Summary, tests, and safety notes are posted for review.</span>
                 </div>
                 <div class="step">
                   <span class="step-number">4</span>
-                  <span><strong>Open PR</strong>Summary, tests, and safety notes are queued for review.</span>
+                  <span><strong>Approve and merge</strong>Owner approves in Telegram; LaunchPilot can merge the PR.</span>
+                </div>
+                <div class="step">
+                  <span class="step-number">5</span>
+                  <span><strong>Open website</strong>LaunchPilot shares the Vercel or GitHub Pages link.</span>
                 </div>
               </div>
             </article>
@@ -646,7 +657,7 @@
               <div class="steps">
                 <div class="step">
                   <span class="step-number">1</span>
-                  <span><strong>Label</strong>Approved issue receives a supported automation label.</span>
+                  <span><strong>Label</strong>Approved issue receives <code>sage-fix</code> or <code>sage-small</code>.</span>
                 </div>
                 <div class="step">
                   <span class="step-number">2</span>
@@ -693,7 +704,7 @@
                 <h3>Task #27: Landing copy</h3>
                 <span class="chip amber">queued</span>
               </div>
-              <p>S.A.G.E. queued issue #118 after the <code>sage:ready</code> label was applied.</p>
+              <p>S.A.G.E. queued issue #118 after the <code>sage-small</code> label was applied.</p>
               <div class="meta">
                 <span class="chip">SAGE-118</span>
                 <span class="chip">frontend</span>
@@ -765,62 +776,62 @@
               <div class="section-head">
                 <div>
                   <h2>Needs Review</h2>
-                  <p>Human approval remains required before merge or deployment.</p>
+                  <p>Review status only. Approve, cancel, merge, and open-website actions happen in Telegram.</p>
                 </div>
               </div>
 
               <div class="review-item">
                 <div>
                   <h3>PR #42: Mission Control dashboard</h3>
-                  <p>Docs-only static page, no runtime secrets, checks pending final review.</p>
+                  <p>Docs-only static page, no runtime secrets, waiting for Telegram approval before LaunchPilot merges.</p>
                   <div class="meta">
                     <span class="chip green">LaunchPilot</span>
                     <span class="chip">docs/index.html</span>
-                    <span class="chip amber">merge blocked</span>
+                    <span class="chip amber">awaiting approval</span>
                   </div>
                 </div>
                 <div class="actions" aria-label="Read-only review actions">
                   <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
-                  <button class="button danger" type="button" aria-disabled="true" disabled>Cancel</button>
-                  <button class="button primary" type="button" aria-disabled="true" disabled>Approve</button>
-                  <button class="button" type="button" aria-disabled="true" disabled>Merge</button>
+                  <button class="button danger" type="button" aria-disabled="true" disabled>Cancel in Telegram</button>
+                  <button class="button primary" type="button" aria-disabled="true" disabled>Approve in Telegram</button>
+                  <button class="button" type="button" aria-disabled="true" disabled>Merge in Telegram</button>
                 </div>
               </div>
 
               <div class="review-item">
                 <div>
                   <h3>Issue #118: Add billing guard copy</h3>
-                  <p>S.A.G.E. draft waiting for owner review and label confirmation.</p>
+                  <p>S.A.G.E. draft waiting for owner review after <code>sage-small</code> triage.</p>
                   <div class="meta">
                     <span class="chip green">S.A.G.E.</span>
                     <span class="chip amber">review</span>
-                    <span class="chip">no PR yet</span>
+                    <span class="chip">sage-small</span>
                   </div>
                 </div>
                 <div class="actions" aria-label="Read-only review actions">
                   <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
-                  <button class="button danger" type="button" aria-disabled="true" disabled>Cancel</button>
-                  <button class="button primary" type="button" aria-disabled="true" disabled>Approve</button>
-                  <button class="button" type="button" aria-disabled="true" disabled>Merge</button>
+                  <button class="button danger" type="button" aria-disabled="true" disabled>Cancel in Telegram</button>
+                  <button class="button primary" type="button" aria-disabled="true" disabled>Approve in Telegram</button>
+                  <button class="button" type="button" aria-disabled="true" disabled>Merge in Telegram</button>
                 </div>
               </div>
             </article>
 
             <article class="card">
               <h2>Deployment Links</h2>
-              <p>Static targets for operators to jump into preview and production surfaces.</p>
+              <p>After approval, LaunchPilot can merge the PR and post the live Vercel or GitHub Pages website link.</p>
               <div class="links" aria-label="Deployment links">
                 <a class="deploy-link" href="#review">
                   <strong>GitHub Pages Preview</strong>
-                  <span>docs build</span>
+                  <span>website link</span>
                 </a>
                 <a class="deploy-link" href="#logs">
                   <strong>Vercel Preview</strong>
-                  <span>sample link</span>
+                  <span>website link</span>
                 </a>
                 <a class="deploy-link" href="#workflows">
                   <strong>GitHub Pages Production</strong>
-                  <span>read-only</span>
+                  <span>after merge</span>
                 </a>
               </div>
             </article>
@@ -859,7 +870,7 @@
                 <tr>
                   <td>09:51 UTC</td>
                   <td>Deploy</td>
-                  <td>GitHub Pages preview awaiting merge.</td>
+                  <td>LaunchPilot ready to merge after Telegram approval and share the website link.</td>
                 </tr>
               </tbody>
             </table>
@@ -896,7 +907,7 @@
                   </tr>
                   <tr>
                     <td><code>task-27</code></td>
-                    <td>Archive logs after merge.</td>
+                    <td>Archive logs after LaunchPilot merges the PR.</td>
                     <td><span class="chip">pending</span></td>
                   </tr>
                   <tr>
@@ -950,13 +961,18 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td><span class="chip green">sage:ready</span></td>
-                    <td>Queue an approved issue for implementation.</td>
+                    <td><span class="chip green">sage-fix</span></td>
+                    <td>Queue an approved bug fix for implementation.</td>
+                    <td>S.A.G.E.</td>
+                  </tr>
+                  <tr>
+                    <td><span class="chip green">sage-small</span></td>
+                    <td>Queue a small, scoped issue for implementation.</td>
                     <td>S.A.G.E.</td>
                   </tr>
                   <tr>
                     <td><span class="chip">launchpilot:build</span></td>
-                    <td>Start an idea-to-PR run from validated context.</td>
+                    <td>Start an idea-to-website run from Telegram context.</td>
                     <td>LaunchPilot</td>
                   </tr>
                   <tr>
@@ -1005,11 +1021,11 @@
             </div>
             <div class="safety">
               <strong>Approve</strong>
-              <span>Human review gates deployment and merge decisions.</span>
+              <span>Human approval is sent in Telegram before LaunchPilot merges.</span>
             </div>
             <div class="safety">
               <strong>Merge</strong>
-              <span>Read-only here; live merge remains inside GitHub review.</span>
+              <span>Read-only here; LaunchPilot can merge from the Telegram flow.</span>
             </div>
             <div class="safety">
               <strong>Cleanup</strong>
