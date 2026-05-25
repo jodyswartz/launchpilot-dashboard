@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LaunchPilot Mission Control</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172033;
+        --muted: #647085;
+        --line: #d9e1ec;
+        --panel: #ffffff;
+        --panel-soft: #f7f9fc;
+        --blue: #2563eb;
+        --blue-dark: #1d4ed8;
+        --green: #12805c;
+        --amber: #b45309;
+        --red: #b42318;
+        --shadow: 0 18px 48px rgba(23, 32, 51, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        color: var(--ink);
+        background: #edf3fb;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        min-height: 100vh;
+      }
+
+      .hero {
+        background:
+          linear-gradient(135deg, rgba(19, 32, 60, 0.94), rgba(32, 71, 122, 0.9)),
+          radial-gradient(circle at 88% 14%, rgba(34, 197, 94, 0.32), transparent 28%),
+          #172033;
+        color: #ffffff;
+      }
+
+      .wrap {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 24px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+        letter-spacing: 0;
+      }
+
+      .mark {
+        display: grid;
+        width: 36px;
+        height: 36px;
+        place-items: center;
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--blue-dark);
+        font-weight: 900;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      nav a,
+      .link-pill {
+        border: 1px solid rgba(255, 255, 255, 0.32);
+        border-radius: 999px;
+        color: #ffffff;
+        padding: 8px 12px;
+        text-decoration: none;
+        font-size: 0.92rem;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        gap: 36px;
+        align-items: end;
+        padding: 44px 0 48px;
+      }
+
+      .eyebrow {
+        color: #b8d5ff;
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.11em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        line-height: 1.08;
+      }
+
+      h1 {
+        max-width: 840px;
+        margin-top: 12px;
+        font-size: clamp(2.35rem, 6vw, 5.25rem);
+      }
+
+      .hero p {
+        max-width: 720px;
+        margin: 20px 0 0;
+        color: #dbeafe;
+        font-size: 1.12rem;
+        line-height: 1.65;
+      }
+
+      .status-panel {
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: var(--shadow);
+      }
+
+      .status-panel h2 {
+        margin-bottom: 18px;
+        font-size: 1.05rem;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .metric {
+        min-height: 96px;
+        padding: 16px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 1.9rem;
+      }
+
+      .metric span {
+        color: #c8d8ee;
+        font-size: 0.9rem;
+      }
+
+      main {
+        padding: 36px 0 56px;
+      }
+
+      .section {
+        margin-top: 28px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 16px;
+      }
+
+      .section-head p {
+        max-width: 680px;
+        margin: 6px 0 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 28px;
+        border-radius: 999px;
+        background: #eaf2ff;
+        color: var(--blue-dark);
+        padding: 5px 10px;
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+
+      .workflow {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .lane,
+      .card,
+      .table-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        box-shadow: 0 8px 28px rgba(23, 32, 51, 0.06);
+      }
+
+      .lane {
+        padding: 20px;
+      }
+
+      .lane.launchpilot {
+        border-top: 5px solid var(--blue);
+      }
+
+      .lane.sage {
+        border-top: 5px solid var(--green);
+      }
+
+      .lane-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .lane-title p {
+        margin: 6px 0 0;
+        color: var(--muted);
+      }
+
+      .steps {
+        display: grid;
+        gap: 10px;
+      }
+
+      .step {
+        position: relative;
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel-soft);
+      }
+
+      .step:not(:last-child)::after {
+        position: absolute;
+        bottom: -12px;
+        left: 30px;
+        width: 2px;
+        height: 12px;
+        background: var(--line);
+        content: "";
+      }
+
+      .step-number {
+        display: grid;
+        width: 34px;
+        height: 34px;
+        place-items: center;
+        border-radius: 8px;
+        background: var(--ink);
+        color: #ffffff;
+        font-weight: 800;
+      }
+
+      .step strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .step span {
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .grid-3,
+      .grid-2 {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .card p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .chip {
+        border-radius: 999px;
+        background: #eef2f7;
+        color: #39465a;
+        padding: 6px 9px;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .chip.green {
+        background: #e8f7f0;
+        color: var(--green);
+      }
+
+      .chip.amber {
+        background: #fff5df;
+        color: var(--amber);
+      }
+
+      .chip.red {
+        background: #fff0ee;
+        color: var(--red);
+      }
+
+      .review-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: center;
+        padding: 16px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .review-item:first-of-type {
+        border-top: 0;
+        padding-top: 0;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .button {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--ink);
+        padding: 9px 11px;
+        font: inherit;
+        font-size: 0.86rem;
+        font-weight: 800;
+      }
+
+      .button.primary {
+        border-color: var(--blue);
+        background: var(--blue);
+        color: #ffffff;
+      }
+
+      .button.danger {
+        border-color: #ffd7d2;
+        color: var(--red);
+      }
+
+      .button[aria-disabled="true"] {
+        cursor: not-allowed;
+      }
+
+      code {
+        border-radius: 6px;
+        background: #eef2f7;
+        padding: 2px 5px;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 0.92em;
+      }
+
+      .table-card {
+        overflow: hidden;
+      }
+
+      .table-card h3 {
+        padding: 18px 18px 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 14px 18px;
+        border-top: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .links {
+        display: grid;
+        gap: 10px;
+      }
+
+      .deploy-link {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel-soft);
+        text-decoration: none;
+      }
+
+      .deploy-link span {
+        color: var(--muted);
+      }
+
+      .safety-list {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .safety {
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .safety strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .safety span {
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      footer {
+        padding: 24px 0 36px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      @media (max-width: 860px) {
+        header,
+        .section-head,
+        .review-item {
+          align-items: start;
+          flex-direction: column;
+        }
+
+        .hero-grid,
+        .workflow,
+        .grid-3,
+        .grid-2,
+        .safety-list {
+          grid-template-columns: 1fr;
+        }
+
+        .review-item {
+          display: block;
+        }
+
+        .actions {
+          justify-content: flex-start;
+          margin-top: 14px;
+        }
+
+        table,
+        tbody,
+        tr,
+        th,
+        td {
+          display: block;
+        }
+
+        thead {
+          display: none;
+        }
+
+        td {
+          border-top: 0;
+          padding-top: 6px;
+          padding-bottom: 6px;
+        }
+
+        tr {
+          padding: 12px 0;
+          border-top: 1px solid var(--line);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <div class="wrap">
+          <header>
+            <div class="brand" aria-label="LaunchPilot">
+              <span class="mark">LP</span>
+              <span>LaunchPilot</span>
+            </div>
+            <nav aria-label="Dashboard sections">
+              <a href="#workflows">Workflows</a>
+              <a href="#activity">Activity</a>
+              <a href="#review">Needs Review</a>
+              <a href="#controls">Controls</a>
+            </nav>
+          </header>
+
+          <div class="hero-grid">
+            <div>
+              <div class="eyebrow">Mission Control</div>
+              <h1>LaunchPilot Mission Control</h1>
+              <p>
+                A read-only dashboard for tracking AI-assisted idea-to-PR and
+                issue-to-PR automation across approved repositories.
+              </p>
+            </div>
+
+            <aside class="status-panel" aria-label="Current mission status">
+              <h2>Today at a glance</h2>
+              <div class="metric-grid">
+                <div class="metric">
+                  <strong>08</strong>
+                  <span>active runs</span>
+                </div>
+                <div class="metric">
+                  <strong>03</strong>
+                  <span>waiting for review</span>
+                </div>
+                <div class="metric">
+                  <strong>12</strong>
+                  <span>PRs opened this week</span>
+                </div>
+                <div class="metric">
+                  <strong>0</strong>
+                  <span>blocked deployments</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <main class="wrap">
+        <section class="section" id="workflows">
+          <div class="section-head">
+            <div>
+              <h2>Two-Lane Workflow</h2>
+              <p>
+                LaunchPilot turns Telegram product ideas into pull requests.
+                S.A.G.E. turns labeled GitHub issues into reviewed automation
+                runs.
+              </p>
+            </div>
+            <span class="badge">Read-only status</span>
+          </div>
+
+          <div class="workflow" aria-label="AI agent workflow diagram">
+            <article class="lane launchpilot">
+              <div class="lane-title">
+                <div>
+                  <h3>LaunchPilot</h3>
+                  <p>Telegram idea-to-PR builds</p>
+                </div>
+                <span class="badge">Idea Lane</span>
+              </div>
+              <div class="steps">
+                <div class="step">
+                  <span class="step-number">1</span>
+                  <span><strong>Capture</strong>Telegram idea arrives with repo and branch context.</span>
+                </div>
+                <div class="step">
+                  <span class="step-number">2</span>
+                  <span><strong>Plan</strong>Agent scopes files, confirms guardrails, and drafts work.</span>
+                </div>
+                <div class="step">
+                  <span class="step-number">3</span>
+                  <span><strong>Build</strong>Changes are made in a task branch with logs attached.</span>
+                </div>
+                <div class="step">
+                  <span class="step-number">4</span>
+                  <span><strong>Open PR</strong>Summary, tests, and safety notes are queued for review.</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="lane sage">
+              <div class="lane-title">
+                <div>
+                  <h3>S.A.G.E.</h3>
+                  <p>Labeled GitHub issue-to-PR automation</p>
+                </div>
+                <span class="badge">Issue Lane</span>
+              </div>
+              <div class="steps">
+                <div class="step">
+                  <span class="step-number">1</span>
+                  <span><strong>Label</strong>Approved issue receives a supported automation label.</span>
+                </div>
+                <div class="step">
+                  <span class="step-number">2</span>
+                  <span><strong>Inspect</strong>Agent reads issue, repo policy, and current branch state.</span>
+                </div>
+                <div class="step">
+                  <span class="step-number">3</span>
+                  <span><strong>Patch</strong>Focused implementation and checks run in isolation.</span>
+                </div>
+                <div class="step">
+                  <span class="step-number">4</span>
+                  <span><strong>Request Review</strong>PR waits for human approval before merge.</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="activity">
+          <div class="section-head">
+            <div>
+              <h2>Recent Activity</h2>
+              <p>Sample events shown for dashboard layout and operator scanning.</p>
+            </div>
+          </div>
+
+          <div class="grid-3">
+            <article class="card">
+              <div class="card-head">
+                <h3>Telegram idea accepted</h3>
+                <span class="chip green">running</span>
+              </div>
+              <p>LaunchPilot started a dashboard polish branch for <code>jodyswartz/launchpilot-dashboard</code>.</p>
+              <div class="meta">
+                <span class="chip">LP-027</span>
+                <span class="chip">docs</span>
+                <span class="chip">2m ago</span>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <h3>Issue label detected</h3>
+                <span class="chip amber">queued</span>
+              </div>
+              <p>S.A.G.E. queued issue #118 after the <code>sage:ready</code> label was applied.</p>
+              <div class="meta">
+                <span class="chip">SAGE-118</span>
+                <span class="chip">frontend</span>
+                <span class="chip">14m ago</span>
+              </div>
+            </article>
+
+            <article class="card">
+              <div class="card-head">
+                <h3>PR checks passed</h3>
+                <span class="chip green">ready</span>
+              </div>
+              <p>Automated tests and static checks completed for a LaunchPilot branch.</p>
+              <div class="meta">
+                <span class="chip">PR #42</span>
+                <span class="chip">checks</span>
+                <span class="chip">31m ago</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="review">
+          <div class="grid-2">
+            <article class="card">
+              <div class="section-head">
+                <div>
+                  <h2>Needs Review</h2>
+                  <p>Human approval remains required before merge or deployment.</p>
+                </div>
+              </div>
+
+              <div class="review-item">
+                <div>
+                  <h3>PR #42: Mission Control dashboard</h3>
+                  <p>Docs-only static page, no runtime secrets, checks pending final review.</p>
+                  <div class="meta">
+                    <span class="chip green">LaunchPilot</span>
+                    <span class="chip">docs/index.html</span>
+                  </div>
+                </div>
+                <div class="actions" aria-label="Read-only review actions">
+                  <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
+                  <button class="button danger" type="button" aria-disabled="true" disabled>Cancel</button>
+                  <button class="button primary" type="button" aria-disabled="true" disabled>Approve</button>
+                  <button class="button" type="button" aria-disabled="true" disabled>Merge</button>
+                </div>
+              </div>
+
+              <div class="review-item">
+                <div>
+                  <h3>Issue #118: Add billing guard copy</h3>
+                  <p>S.A.G.E. draft waiting for owner review and label confirmation.</p>
+                  <div class="meta">
+                    <span class="chip green">S.A.G.E.</span>
+                    <span class="chip amber">review</span>
+                  </div>
+                </div>
+                <div class="actions" aria-label="Read-only review actions">
+                  <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
+                  <button class="button danger" type="button" aria-disabled="true" disabled>Cancel</button>
+                  <button class="button primary" type="button" aria-disabled="true" disabled>Approve</button>
+                  <button class="button" type="button" aria-disabled="true" disabled>Merge</button>
+                </div>
+              </div>
+            </article>
+
+            <article class="card">
+              <h2>Deployment Links</h2>
+              <p>Static targets for operators to jump into review surfaces.</p>
+              <div class="links" aria-label="Deployment links">
+                <a class="deploy-link" href="#review">
+                  <strong>GitHub Pages Preview</strong>
+                  <span>docs build</span>
+                </a>
+                <a class="deploy-link" href="#activity">
+                  <strong>Actions Run Log</strong>
+                  <span>latest checks</span>
+                </a>
+                <a class="deploy-link" href="#workflows">
+                  <strong>Production Dashboard</strong>
+                  <span>read-only</span>
+                </a>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="controls">
+          <div class="section-head">
+            <div>
+              <h2>Repos, Labels, and Safety Controls</h2>
+              <p>
+                Automation only runs against approved repositories and supported
+                labels. Controls are visible here as operator affordances, but
+                inactive in this static dashboard.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <article class="table-card">
+              <h3>Whitelisted Repos</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Repository</th>
+                    <th>Agent</th>
+                    <th>Access</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>jodyswartz/launchpilot-dashboard</td>
+                    <td>LaunchPilot, S.A.G.E.</td>
+                    <td><span class="chip green">docs + PRs</span></td>
+                  </tr>
+                  <tr>
+                    <td>jodyswartz/launchpilot-app</td>
+                    <td>LaunchPilot</td>
+                    <td><span class="chip">feature branches</span></td>
+                  </tr>
+                  <tr>
+                    <td>jodyswartz/sage-automation</td>
+                    <td>S.A.G.E.</td>
+                    <td><span class="chip">labeled issues</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </article>
+
+            <article class="table-card">
+              <h3>Supported Labels</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Purpose</th>
+                    <th>Agent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="chip green">sage:ready</span></td>
+                    <td>Queue an approved issue for implementation.</td>
+                    <td>S.A.G.E.</td>
+                  </tr>
+                  <tr>
+                    <td><span class="chip">launchpilot:build</span></td>
+                    <td>Start an idea-to-PR run from validated context.</td>
+                    <td>LaunchPilot</td>
+                  </tr>
+                  <tr>
+                    <td><span class="chip amber">needs-human</span></td>
+                    <td>Pause automation until an owner responds.</td>
+                    <td>Both</td>
+                  </tr>
+                </tbody>
+              </table>
+            </article>
+          </div>
+
+          <div class="safety-list section" aria-label="Safety controls">
+            <div class="safety">
+              <strong>Logs</strong>
+              <span>Every run links to prompt, diff, and check output.</span>
+            </div>
+            <div class="safety">
+              <strong>Cancel</strong>
+              <span>Operators can stop queued or active work before PR creation.</span>
+            </div>
+            <div class="safety">
+              <strong>Approve</strong>
+              <span>Human review gates deployment and merge decisions.</span>
+            </div>
+            <div class="safety">
+              <strong>Merge</strong>
+              <span>Read-only here; live merge remains inside GitHub review.</span>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="wrap">
+        LaunchPilot Mission Control is a static dashboard mockup for GitHub Pages.
+      </footer>
+    </div>
+  </body>
+</html>
