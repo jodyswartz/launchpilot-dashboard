@@ -1,0 +1,3 @@
+Task #31: Update the README to describe LaunchPilot Mission Control, including LaunchPilot Telegram tasks, S.A.G.E. GitHub issue automation, /logs, /cancel, /cleanup, approve-and-merge, and Vercel/GitHub Pages deployment links. Keep it beginner-friendly and include an example workflow.
+
+Make the smallest useful change. Do not edit secrets, .env files, SSH keys, or deployment tokens. Do not make unrelated refactors.
