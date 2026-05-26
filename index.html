@@ -1010,6 +1010,26 @@
                 </tbody>
               </table>
             </article>
+
+            <article class="table-card">
+              <h3>Failed Tasks</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Task</th>
+                    <th>Failure</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="failed-tasks">
+                  <tr>
+                    <td><code>LP-024</code></td>
+                    <td>Automation run stopped before PR creation.</td>
+                    <td><span class="chip red">failed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </article>
           </div>
 
           <div class="safety-list section" aria-label="Safety controls">
@@ -1043,10 +1063,10 @@
     </div>
     <script>
       (() => {
-        const DATA_URL = "dashboard/tasks.json";
+        const DATA_URL = "https://raw.githubusercontent.com/jodyswartz/launchpilot-data/main/tasks.json";
         const statusClass = (value = "") => {
           const text = String(value).toLowerCase();
-          if (/(ready|running|building|merged|open|complete|archived|allowed|success)/.test(text)) {
+          if (/(ready|running|building|merged|open|complete|archived|allowed|approved|success)/.test(text)) {
             return " green";
           }
           if (/(waiting|queued|review|hold|pending|needs|blocked)/.test(text)) {
@@ -1088,75 +1108,128 @@
           const value = String(href || "#").trim();
           return /^(https?:\/\/|#|\.?\/)/.test(value) ? value : "#";
         };
-        const taskStatus = (task) => String(task.status ?? task.state ?? "").toLowerCase();
+        const timeValue = (value = "") => {
+          const time = Date.parse(String(value).replace(" ", "T"));
+          return Number.isNaN(time) ? 0 : time;
+        };
+        const byUpdatedDesc = (items) => [...asArray(items)].sort((a, b) =>
+          timeValue(b.updatedAt ?? b.updated_at ?? b.createdAt ?? b.created_at) -
+          timeValue(a.updatedAt ?? a.updated_at ?? a.createdAt ?? a.created_at)
+        );
+        const taskStatus = (task) => String([
+          task.status ?? task.state ?? "",
+          task.codexStatus ?? task.codex_status ?? "",
+        ].join(" ")).toLowerCase();
         const taskId = (task) => task.displayId ?? task.display_id ?? task.key ?? task.id ?? "";
         const taskTitle = (task) => typeof task === "string"
           ? task
-          : task.title ?? task.name ?? (taskId(task) ? `Task ${taskId(task)}` : "Untitled task");
+          : task.title ?? task.name ?? (taskId(task) ? `Task #${taskId(task)}` : "Untitled task");
+        const taskSummary = (task) => task.description ?? task.summary ?? task.idea ?? "";
+        const latestLogMessage = (task, fallback = "") => {
+          const logs = asArray(task.logs);
+          const log = logs[logs.length - 1];
+          return log?.message ?? log?.text ?? fallback;
+        };
+        const cleanupFor = (task) => {
+          const status = taskStatus(task);
+          if (/cancel/.test(status)) return "Cancelled run; archive logs and remove temporary workspace.";
+          if (/fail|error/.test(status)) return "Failed run; keep logs for triage before cleanup.";
+          if (/merged|complete|approved/.test(status)) return "Completed run; workspace can be cleaned after review.";
+          return "Keep workspace until automation run closes.";
+        };
+        const cleanupStatusFor = (task) => {
+          const status = taskStatus(task);
+          if (/cancel/.test(status)) return "logs archived";
+          if (/fail|error/.test(status)) return "needs triage";
+          if (/merged|complete|approved/.test(status)) return "ready";
+          return "hold";
+        };
         const normalizeDashboard = (raw) => {
           const data = Array.isArray(raw) ? { tasks: raw } : { ...(raw || {}) };
           const tasks = asArray(data.tasks);
           if (!tasks.length) return data;
           const has = (names) => names.some((name) => Object.prototype.hasOwnProperty.call(data, name));
           const taskCount = (pattern) => tasks.filter((task) => pattern.test(taskStatus(task))).length;
+          const sortedTasks = byUpdatedDesc(tasks);
+          const generatedAt = timeValue(data.generated_at) || Date.now();
+          const oneWeekAgo = generatedAt - (7 * 24 * 60 * 60 * 1000);
+          const hasPullRequest = (task) => task.pr || task.prUrl || task.pr_url || task.pullRequest;
+          const reviewTasks = sortedTasks.filter((task) =>
+            /(pr_created|review|approval|waiting|awaiting)/.test(taskStatus(task))
+          );
 
           if (!has(["metrics", "topMetrics", "top_metrics"])) {
             data.metrics = [
               { value: taskCount(/active|running|building|started/), label: "active runs" },
-              { value: taskCount(/review|approval|waiting/), label: "waiting for review" },
-              { value: tasks.filter((task) => task.pr || task.prUrl || task.pr_url || task.pullRequest).length, label: "PRs opened this week" },
+              { value: reviewTasks.length, label: "waiting for review" },
+              { value: tasks.filter((task) => hasPullRequest(task) && timeValue(task.createdAt ?? task.created_at) >= oneWeekAgo).length, label: "PRs opened this week" },
               { value: taskCount(/cancel/), label: "cancelled tasks" },
-              { value: taskCount(/blocked/), label: "blocked deployments" },
+              { value: taskCount(/fail|error/), label: "failed tasks" },
             ];
           }
           if (!has(["recentTasks", "recent_tasks"])) {
-            data.recentTasks = tasks.slice(0, 3);
+            data.recentTasks = sortedTasks.slice(0, 3);
           }
           if (!has(["statusBoard", "status_board", "statuses"])) {
-            data.statusBoard = tasks.map((task) => ({
+            data.statusBoard = sortedTasks.map((task) => ({
               task: taskTitle(task),
-              owner: task.owner ?? task.agent ?? task.source,
-              status: task.status ?? task.state,
-              nextCheck: task.nextCheck ?? task.next_check ?? task.next,
+              owner: task.owner ?? task.agent ?? task.source ?? "LaunchPilot",
+              status: task.status ?? task.state ?? task.codex_status,
+              nextCheck: task.nextCheck ?? task.next_check ?? task.next ?? task.updated_at ?? task.updatedAt ?? "",
             }));
           }
           if (!has(["needsReview", "needs_review", "reviews"])) {
-            data.needsReview = tasks.filter((task) => /review|approval|waiting/.test(taskStatus(task)));
+            data.needsReview = reviewTasks;
           }
           if (!has(["deploymentLinks", "deployment_links", "deployments"])) {
-            data.deploymentLinks = tasks.flatMap((task) => {
+            data.deploymentLinks = sortedTasks.flatMap((task) => {
               const links = task.deploymentLinks ?? task.deployment_links ?? task.deployments ?? [];
               if (Array.isArray(links) && links.length) return links;
-              return [task.previewUrl ?? task.preview_url, task.deployUrl ?? task.deploy_url, task.url]
-                .filter(Boolean)
-                .map((url) => ({ title: taskTitle(task), url, label: "website link" }));
-            });
+              return [
+                { url: task.previewUrl ?? task.preview_url ?? task.deployUrl ?? task.deploy_url, label: "website link" },
+                { url: task.prUrl ?? task.pr_url ?? task.pullRequest ?? task.pr, label: "pull request" },
+              ]
+                .filter((link) => link.url)
+                .map((link) => ({ title: taskTitle(task), ...link }));
+            }).slice(0, 12);
           }
           if (!has(["latestLogs", "latest_logs", "logs"])) {
             data.latestLogs = tasks.flatMap((task) => {
               const logs = asArray(task.logs);
-              if (logs.length) return logs;
+              if (logs.length) return logs.map((log) => ({
+                ...log,
+                source: log.source ?? taskTitle(task),
+                time: log.time ?? log.timestamp ?? log.created_at,
+              }));
               return task.latestLog || task.latest_log
-                ? [{ time: task.updatedAt ?? task.updated_at ?? "", source: task.agent ?? task.owner ?? "", message: task.latestLog ?? task.latest_log }]
+                ? [{ time: task.updatedAt ?? task.updated_at ?? "", source: taskTitle(task), message: task.latestLog ?? task.latest_log }]
                 : [];
-            }).slice(0, 8);
+            }).sort((a, b) => timeValue(b.time ?? b.timestamp ?? b.created_at) - timeValue(a.time ?? a.timestamp ?? a.created_at)).slice(0, 8);
           }
           if (!has(["cleanupQueue", "cleanup_queue", "cleanup"])) {
-            data.cleanupQueue = tasks
-              .filter((task) => task.cleanup || task.workspace)
+            data.cleanupQueue = sortedTasks
               .map((task) => ({
                 workspace: task.workspace ?? taskId(task),
-                cleanup: task.cleanup ?? "Track workspace until review closes.",
-                status: task.cleanupStatus ?? task.cleanup_status ?? task.status,
-              }));
+                cleanup: task.cleanup ?? cleanupFor(task),
+                status: task.cleanupStatus ?? task.cleanup_status ?? cleanupStatusFor(task),
+              })).slice(0, 8);
           }
           if (!has(["cancelledTasks", "cancelled_tasks", "cancelled"])) {
-            data.cancelledTasks = tasks
+            data.cancelledTasks = sortedTasks
               .filter((task) => /cancel/.test(taskStatus(task)))
               .map((task) => ({
                 task: taskId(task) || taskTitle(task),
-                reason: task.reason ?? task.cancelReason ?? task.cancel_reason ?? "",
+                reason: task.reason ?? task.cancelReason ?? task.cancel_reason ?? latestLogMessage(task, "Task was cancelled."),
                 cleanup: task.cleanup ?? task.cleanupStatus ?? task.cleanup_status ?? "pending",
+              }));
+          }
+          if (!has(["failedTasks", "failed_tasks", "failed"])) {
+            data.failedTasks = sortedTasks
+              .filter((task) => /fail|error/.test(taskStatus(task)))
+              .map((task) => ({
+                task: taskId(task) || taskTitle(task),
+                failure: task.failure ?? task.error ?? latestLogMessage(task, "Automation run failed."),
+                status: task.status ?? task.codex_status ?? "failed",
               }));
           }
           return data;
@@ -1181,11 +1254,11 @@
                 <h3>${escape(taskTitle(task))}</h3>
                 ${chip(task.status ?? task.state ?? "unknown")}
               </div>
-              <p>${escape(task.description ?? task.summary ?? "")}</p>
+              <p>${escape(taskSummary(task))}</p>
               <div class="meta">
                 ${(asArray(task.meta ?? task.tags).length
                   ? asArray(task.meta ?? task.tags)
-                  : [taskId(task), task.repo ?? task.repository, task.updatedAt ?? task.updated_at].filter(Boolean)
+                  : [task.repo ?? task.repository, task.risk, task.updatedAt ?? task.updated_at].filter(Boolean)
                 ).map((item) => chip(item)).join("")}
               </div>
             </article>
@@ -1208,11 +1281,11 @@
             <div class="review-item">
               <div>
                 <h3>${escape(taskTitle(item))}</h3>
-                <p>${escape(item.description ?? item.summary ?? "")}</p>
+                <p>${escape(taskSummary(item))}</p>
                 <div class="meta">
                   ${(asArray(item.meta ?? item.tags).length
                     ? asArray(item.meta ?? item.tags)
-                    : [item.agent ?? item.owner, item.repo ?? item.repository, item.status ?? item.state].filter(Boolean)
+                    : [item.agent ?? item.owner ?? "LaunchPilot", item.repo ?? item.repository, item.status ?? item.state].filter(Boolean)
                   ).map((entry) => chip(entry)).join("")}
                 </div>
               </div>
@@ -1294,6 +1367,16 @@
           `).join("") || emptyRows(3, "No cancelled tasks."));
         };
 
+        const renderFailed = (tasks) => {
+          setHTML("failed-tasks", asArray(tasks).map((task) => `
+            <tr>
+              <td>${code(task.task ?? task.id ?? task.title ?? "")}</td>
+              <td>${escape(task.failure ?? task.reason ?? task.description ?? "")}</td>
+              <td>${chip(task.status ?? "failed")}</td>
+            </tr>
+          `).join("") || emptyRows(3, "No failed tasks."));
+        };
+
         const renderIfPresent = (data, names, render) => {
           const result = firstValue(data, names);
           if (result.found) render(result.value);
@@ -1317,6 +1400,7 @@
             renderIfPresent(data, ["whitelistedRepos", "whitelisted_repos", "repos"], renderRepos);
             renderIfPresent(data, ["supportedLabels", "supported_labels", "labels"], renderLabels);
             renderIfPresent(data, ["cancelledTasks", "cancelled_tasks", "cancelled"], renderCancelled);
+            renderIfPresent(data, ["failedTasks", "failed_tasks", "failed"], renderFailed);
           })
           .catch(() => {
             // Keep the static sample dashboard intact when Pages cannot load JSON.
