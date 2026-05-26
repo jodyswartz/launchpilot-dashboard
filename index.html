@@ -1121,10 +1121,19 @@
           task.codexStatus ?? task.codex_status ?? "",
         ].join(" ")).toLowerCase();
         const taskId = (task) => task.displayId ?? task.display_id ?? task.key ?? task.id ?? "";
+        const taskLabel = (task) => {
+          const id = taskId(task);
+          if (!id) return "";
+          return /^\d+$/.test(String(id)) ? `Task #${id}` : String(id);
+        };
         const taskTitle = (task) => typeof task === "string"
           ? task
-          : task.title ?? task.name ?? (taskId(task) ? `Task #${taskId(task)}` : "Untitled task");
-        const taskSummary = (task) => task.description ?? task.summary ?? task.idea ?? "";
+          : task.title ?? task.name ?? (
+            task.idea && taskLabel(task)
+              ? `${taskLabel(task)}: ${task.idea}`
+              : task.idea ?? taskLabel(task) ?? "Untitled task"
+          );
+        const taskSummary = (task) => task.description ?? task.summary ?? task.repo ?? task.repository ?? task.idea ?? "";
         const latestLogMessage = (task, fallback = "") => {
           const logs = asArray(task.logs);
           const log = logs[logs.length - 1];
@@ -1151,9 +1160,6 @@
           const has = (names) => names.some((name) => Object.prototype.hasOwnProperty.call(data, name));
           const taskCount = (pattern) => tasks.filter((task) => pattern.test(taskStatus(task))).length;
           const sortedTasks = byUpdatedDesc(tasks);
-          const generatedAt = timeValue(data.generated_at) || Date.now();
-          const oneWeekAgo = generatedAt - (7 * 24 * 60 * 60 * 1000);
-          const hasPullRequest = (task) => task.pr || task.prUrl || task.pr_url || task.pullRequest;
           const reviewTasks = sortedTasks.filter((task) =>
             /(pr_created|review|approval|waiting|awaiting)/.test(taskStatus(task))
           );
@@ -1162,7 +1168,7 @@
             data.metrics = [
               { value: taskCount(/active|running|building|started/), label: "active runs" },
               { value: reviewTasks.length, label: "waiting for review" },
-              { value: tasks.filter((task) => hasPullRequest(task) && timeValue(task.createdAt ?? task.created_at) >= oneWeekAgo).length, label: "PRs opened this week" },
+              { value: taskCount(/complete|completed|merged|approved|success/), label: "completed tasks" },
               { value: taskCount(/cancel/), label: "cancelled tasks" },
               { value: taskCount(/fail|error/), label: "failed tasks" },
             ];
