@@ -1,35 +1,59 @@
 # LaunchPilot Mission Control
 
-LaunchPilot Mission Control is a beginner-friendly dashboard for watching
-AI-assisted repository work move from request to pull request. It is a static
-site served from `index.html`, so there is no app server to run.
+LaunchPilot Mission Control is the static GitHub Pages dashboard for
+LaunchPilot. This repository is not the LaunchPilot bot backend and does not
+run Telegram commands, GitHub automation, workers, queues, or deployment
+services.
+
+The production page is served from `index.html`. It fetches sanitized task data
+from:
+
+```text
+https://raw.githubusercontent.com/jodyswartz/launchpilot-data/main/tasks.json
+```
+
+If that JSON cannot be loaded, the page should keep rendering the fallback
+sample data already embedded in `index.html`.
 
 ## What it tracks
 
-- **LaunchPilot Telegram tasks**: ideas sent through Telegram become focused
-  tasks, branches, and pull requests.
-- **S.A.G.E. GitHub issue automation**: labeled GitHub issues can be picked up
-  by S.A.G.E., implemented on a branch, and opened as pull requests for review.
-- **Review status**: work stays visible while it is queued, running, waiting for
-  review, cancelled, merged, or ready for cleanup.
+- Metrics for active, review, completed, cancelled, and failed work.
+- Recent LaunchPilot tasks and task status.
+- Needs-review items with read-only action buttons.
+- Latest logs loaded from task data when available.
+- Deployment and pull request links.
+- Cancelled tasks, failed tasks, and cleanup status.
 
-## Operator actions
+Commands such as `/logs`, `/cancel`, `/cleanup`, approve, and merge are handled
+by the LaunchPilot bot flow, not by this dashboard.
 
-- `/logs` shows the task prompt, branch, changed files, command output, and
-  current status.
-- `/cancel` stops queued or active automation before it continues.
-- `/cleanup` removes or archives temporary task resources after a run is done.
-- **Approve-and-merge** means a human reviews the pull request, approves it, and
-  merges it only when the changes and checks look good.
+## Three-repo architecture
+
+- `jodyswartz/launchpilot`: the bot and automation backend. It handles
+  Telegram commands, repository work, pull requests, review flow, cancellation,
+  cleanup, and publishing sanitized dashboard data.
+- `jodyswartz/launchpilot-data`: the public data repository. It exposes
+  `tasks.json`, which contains sanitized LaunchPilot task data for the
+  dashboard.
+- `jodyswartz/launchpilot-dashboard`: this static dashboard. It fetches
+  `tasks.json` and renders the production GitHub Pages view.
+
+## Quickstart
+
+1. Open `index.html` directly in a browser to view the dashboard locally.
+2. To publish it, enable GitHub Pages for this repository and serve from the
+   repository root.
+3. If the data source changes, update `DATA_URL` in `index.html`.
+4. If `tasks.json` cannot be loaded, check the browser console, confirm the raw
+   GitHub URL is reachable, verify the JSON is valid, and make sure the data
+   file contains only sanitized public fields.
 
 ## Deployment links
 
 - GitHub Pages: `https://jodyswartz.github.io/launchpilot-dashboard/`
-- Vercel: `https://launchpilot-dashboard.vercel.app/`
 
 GitHub Pages serves the dashboard from the repository root through
-`index.html`. Vercel can serve the same static page as a preview or production
-deployment.
+`index.html`.
 
 ## Example workflow
 
@@ -43,5 +67,5 @@ deployment.
    resources, use `/cleanup`.
 5. Review the pull request in GitHub. If the diff and checks are good, use the
    approve-and-merge flow.
-6. After merge, check the GitHub Pages or Vercel deployment link to confirm the
-   dashboard updated.
+6. After merge, check the GitHub Pages deployment link to confirm the dashboard
+   updated.
