@@ -1,0 +1,3 @@
+Task #48: Update the Mission Control dashboard so it reads real data from https://raw.githubusercontent.com/jodyswartz/launchpilot-data/main/tasks.json. Use fetch() to load the JSON, populate the metrics, recent tasks, needs-review items, latest logs, deployment links, cancelled tasks, failed tasks, and cleanup status. Keep the existing static sample data as a fallback if the JSON cannot be loaded. Preserve the current design style and make it GitHub Pages compatible.
+
+Make the smallest useful change. Do not edit secrets, .env files, SSH keys, or deployment tokens. Do not make unrelated refactors.
