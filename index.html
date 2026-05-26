@@ -1112,6 +1112,17 @@
           const time = Date.parse(String(value).replace(" ", "T"));
           return Number.isNaN(time) ? 0 : time;
         };
+        const formatTimestamp = (value = "") => {
+          const time = timeValue(value);
+          if (!time) return "";
+          return new Intl.DateTimeFormat(undefined, {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZoneName: "short",
+          }).format(new Date(time));
+        };
         const byUpdatedDesc = (items) => [...asArray(items)].sort((a, b) =>
           timeValue(b.updatedAt ?? b.updated_at ?? b.createdAt ?? b.created_at) -
           timeValue(a.updatedAt ?? a.updated_at ?? a.createdAt ?? a.created_at)
@@ -1119,6 +1130,22 @@
         const taskStatus = (task) => String([
           task.status ?? task.state ?? "",
           task.codexStatus ?? task.codex_status ?? "",
+        ].join(" ")).toLowerCase();
+        const taskUpdatedAt = (task) => task.updatedAt ?? task.updated_at ?? task.createdAt ?? task.created_at ?? "";
+        const isStaleRunningTask = (task) => {
+          const status = taskStatus(task);
+          const updatedAt = timeValue(taskUpdatedAt(task));
+          return /codex_running|running|building|started/.test(status) &&
+            updatedAt > 0 &&
+            Date.now() - updatedAt > 24 * 60 * 60 * 1000;
+        };
+        const effectiveTaskStatus = (task) =>
+          isStaleRunningTask(task)
+            ? "blocked/stale"
+            : task.status ?? task.state ?? task.codex_status ?? "unknown";
+        const effectiveTaskStatusText = (task) => String([
+          effectiveTaskStatus(task),
+          isStaleRunningTask(task) ? "" : task.codexStatus ?? task.codex_status ?? "",
         ].join(" ")).toLowerCase();
         const taskId = (task) => task.displayId ?? task.display_id ?? task.key ?? task.id ?? "";
         const taskLabel = (task) => {
@@ -1140,14 +1167,16 @@
           return log?.message ?? log?.text ?? fallback;
         };
         const cleanupFor = (task) => {
-          const status = taskStatus(task);
+          const status = effectiveTaskStatusText(task);
+          if (/stale/.test(status)) return "Stale Codex run; review logs before cleanup.";
           if (/cancel/.test(status)) return "Cancelled run; archive logs and remove temporary workspace.";
           if (/fail|error/.test(status)) return "Failed run; keep logs for triage before cleanup.";
           if (/merged|complete|approved/.test(status)) return "Completed run; workspace can be cleaned after review.";
           return "Keep workspace until automation run closes.";
         };
         const cleanupStatusFor = (task) => {
-          const status = taskStatus(task);
+          const status = effectiveTaskStatusText(task);
+          if (/stale/.test(status)) return "blocked/stale";
           if (/cancel/.test(status)) return "logs archived";
           if (/fail|error/.test(status)) return "needs triage";
           if (/merged|complete|approved/.test(status)) return "ready";
@@ -1157,87 +1186,60 @@
           const data = Array.isArray(raw) ? { tasks: raw } : { ...(raw || {}) };
           const tasks = asArray(data.tasks);
           if (!tasks.length) return data;
-          const has = (names) => names.some((name) => Object.prototype.hasOwnProperty.call(data, name));
-          const taskCount = (pattern) => tasks.filter((task) => pattern.test(taskStatus(task))).length;
+          const taskCount = (pattern) => tasks.filter((task) => pattern.test(effectiveTaskStatusText(task))).length;
           const sortedTasks = byUpdatedDesc(tasks);
           const reviewTasks = sortedTasks.filter((task) =>
-            /(pr_created|review|approval|waiting|awaiting)/.test(taskStatus(task))
+            /(pr_created|review|approval|waiting|awaiting)/.test(effectiveTaskStatusText(task))
           );
 
-          if (!has(["metrics", "topMetrics", "top_metrics"])) {
-            data.metrics = [
-              { value: taskCount(/active|running|building|started/), label: "active runs" },
-              { value: reviewTasks.length, label: "waiting for review" },
-              { value: taskCount(/complete|completed|merged|approved|success/), label: "completed tasks" },
-              { value: taskCount(/cancel/), label: "cancelled tasks" },
-              { value: taskCount(/fail|error/), label: "failed tasks" },
-            ];
-          }
-          if (!has(["recentTasks", "recent_tasks"])) {
-            data.recentTasks = sortedTasks.slice(0, 3);
-          }
-          if (!has(["statusBoard", "status_board", "statuses"])) {
-            data.statusBoard = sortedTasks.map((task) => ({
-              task: taskTitle(task),
-              owner: task.owner ?? task.agent ?? task.source ?? "LaunchPilot",
-              status: task.status ?? task.state ?? task.codex_status,
-              nextCheck: task.nextCheck ?? task.next_check ?? task.next ?? task.updated_at ?? task.updatedAt ?? "",
+          data.metrics = [
+            { value: taskCount(/\b(active|codex_running|running|building|started)\b/), label: "active runs" },
+            { value: reviewTasks.length, label: "waiting for review" },
+            { value: taskCount(/complete|completed|merged|approved|success/), label: "completed tasks" },
+            { value: taskCount(/cancel/), label: "cancelled tasks" },
+            { value: taskCount(/fail|error/), label: "failed tasks" },
+            { value: formatTimestamp(data.generated_at) || "unknown", label: "last updated" },
+          ];
+          data.recentTasks = sortedTasks.slice(0, 3);
+          data.statusBoard = sortedTasks.map((task) => ({
+            task: taskTitle(task),
+            owner: task.owner ?? task.agent ?? task.source ?? "LaunchPilot",
+            status: effectiveTaskStatus(task),
+            nextCheck: formatTimestamp(taskUpdatedAt(task)) || taskUpdatedAt(task),
+          }));
+          data.needsReview = reviewTasks;
+          data.deploymentLinks = sortedTasks.flatMap((task) => [
+            { url: task.preview_url, label: "website link" },
+            { url: task.pr_url, label: "pull request" },
+          ]
+            .filter((link) => link.url)
+            .map((link) => ({ title: taskTitle(task), ...link }))
+          ).slice(0, 12);
+          data.latestLogs = tasks.flatMap((task) => asArray(task.logs).map((log) => ({
+            ...log,
+            source: log.source ?? taskTitle(task),
+            time: log.time ?? log.timestamp ?? log.created_at,
+          }))).sort((a, b) => timeValue(b.time ?? b.timestamp ?? b.created_at) - timeValue(a.time ?? a.timestamp ?? a.created_at)).slice(0, 8);
+          data.cleanupQueue = sortedTasks
+            .map((task) => ({
+              workspace: task.workspace ?? taskId(task),
+              cleanup: task.cleanup ?? cleanupFor(task),
+              status: task.cleanupStatus ?? task.cleanup_status ?? cleanupStatusFor(task),
+            })).slice(0, 8);
+          data.cancelledTasks = sortedTasks
+            .filter((task) => /cancel/.test(effectiveTaskStatusText(task)))
+            .map((task) => ({
+              task: taskId(task) || taskTitle(task),
+              reason: task.reason ?? task.cancelReason ?? task.cancel_reason ?? latestLogMessage(task, "Task was cancelled."),
+              cleanup: task.cleanup ?? task.cleanupStatus ?? task.cleanup_status ?? "pending",
             }));
-          }
-          if (!has(["needsReview", "needs_review", "reviews"])) {
-            data.needsReview = reviewTasks;
-          }
-          if (!has(["deploymentLinks", "deployment_links", "deployments"])) {
-            data.deploymentLinks = sortedTasks.flatMap((task) => {
-              const links = task.deploymentLinks ?? task.deployment_links ?? task.deployments ?? [];
-              if (Array.isArray(links) && links.length) return links;
-              return [
-                { url: task.previewUrl ?? task.preview_url ?? task.deployUrl ?? task.deploy_url, label: "website link" },
-                { url: task.prUrl ?? task.pr_url ?? task.pullRequest ?? task.pr, label: "pull request" },
-              ]
-                .filter((link) => link.url)
-                .map((link) => ({ title: taskTitle(task), ...link }));
-            }).slice(0, 12);
-          }
-          if (!has(["latestLogs", "latest_logs", "logs"])) {
-            data.latestLogs = tasks.flatMap((task) => {
-              const logs = asArray(task.logs);
-              if (logs.length) return logs.map((log) => ({
-                ...log,
-                source: log.source ?? taskTitle(task),
-                time: log.time ?? log.timestamp ?? log.created_at,
-              }));
-              return task.latestLog || task.latest_log
-                ? [{ time: task.updatedAt ?? task.updated_at ?? "", source: taskTitle(task), message: task.latestLog ?? task.latest_log }]
-                : [];
-            }).sort((a, b) => timeValue(b.time ?? b.timestamp ?? b.created_at) - timeValue(a.time ?? a.timestamp ?? a.created_at)).slice(0, 8);
-          }
-          if (!has(["cleanupQueue", "cleanup_queue", "cleanup"])) {
-            data.cleanupQueue = sortedTasks
-              .map((task) => ({
-                workspace: task.workspace ?? taskId(task),
-                cleanup: task.cleanup ?? cleanupFor(task),
-                status: task.cleanupStatus ?? task.cleanup_status ?? cleanupStatusFor(task),
-              })).slice(0, 8);
-          }
-          if (!has(["cancelledTasks", "cancelled_tasks", "cancelled"])) {
-            data.cancelledTasks = sortedTasks
-              .filter((task) => /cancel/.test(taskStatus(task)))
-              .map((task) => ({
-                task: taskId(task) || taskTitle(task),
-                reason: task.reason ?? task.cancelReason ?? task.cancel_reason ?? latestLogMessage(task, "Task was cancelled."),
-                cleanup: task.cleanup ?? task.cleanupStatus ?? task.cleanup_status ?? "pending",
-              }));
-          }
-          if (!has(["failedTasks", "failed_tasks", "failed"])) {
-            data.failedTasks = sortedTasks
-              .filter((task) => /fail|error/.test(taskStatus(task)))
-              .map((task) => ({
-                task: taskId(task) || taskTitle(task),
-                failure: task.failure ?? task.error ?? latestLogMessage(task, "Automation run failed."),
-                status: task.status ?? task.codex_status ?? "failed",
-              }));
-          }
+          data.failedTasks = sortedTasks
+            .filter((task) => /fail|error/.test(effectiveTaskStatusText(task)))
+            .map((task) => ({
+              task: taskId(task) || taskTitle(task),
+              failure: task.failure ?? task.error ?? latestLogMessage(task, "Automation run failed."),
+              status: effectiveTaskStatus(task),
+            }));
           return data;
         };
 
@@ -1258,7 +1260,7 @@
             <article class="card">
               <div class="card-head">
                 <h3>${escape(taskTitle(task))}</h3>
-                ${chip(task.status ?? task.state ?? "unknown")}
+                ${chip(effectiveTaskStatus(task))}
               </div>
               <p>${escape(taskSummary(task))}</p>
               <div class="meta">
@@ -1291,7 +1293,7 @@
                 <div class="meta">
                   ${(asArray(item.meta ?? item.tags).length
                     ? asArray(item.meta ?? item.tags)
-                    : [item.agent ?? item.owner ?? "LaunchPilot", item.repo ?? item.repository, item.status ?? item.state].filter(Boolean)
+                    : [item.agent ?? item.owner ?? "LaunchPilot", item.repo ?? item.repository, effectiveTaskStatus(item)].filter(Boolean)
                   ).map((entry) => chip(entry)).join("")}
                 </div>
               </div>
@@ -1396,17 +1398,17 @@
           .then((data) => {
             data = data.dashboard || data;
             data = normalizeDashboard(data);
-            renderIfPresent(data, ["metrics", "topMetrics", "top_metrics"], renderMetrics);
-            renderIfPresent(data, ["recentTasks", "recent_tasks", "tasks"], renderRecentTasks);
-            renderIfPresent(data, ["statusBoard", "status_board", "statuses"], renderStatusBoard);
-            renderIfPresent(data, ["needsReview", "needs_review", "reviews"], renderReviews);
-            renderIfPresent(data, ["deploymentLinks", "deployment_links", "deployments"], renderDeploymentLinks);
-            renderIfPresent(data, ["latestLogs", "latest_logs", "logs"], renderLogs);
-            renderIfPresent(data, ["cleanupQueue", "cleanup_queue", "cleanup"], renderCleanup);
+            renderMetrics(data.metrics);
+            renderRecentTasks(data.recentTasks);
+            renderStatusBoard(data.statusBoard);
+            renderReviews(data.needsReview);
+            renderDeploymentLinks(data.deploymentLinks);
+            renderLogs(data.latestLogs);
+            renderCleanup(data.cleanupQueue);
             renderIfPresent(data, ["whitelistedRepos", "whitelisted_repos", "repos"], renderRepos);
             renderIfPresent(data, ["supportedLabels", "supported_labels", "labels"], renderLabels);
-            renderIfPresent(data, ["cancelledTasks", "cancelled_tasks", "cancelled"], renderCancelled);
-            renderIfPresent(data, ["failedTasks", "failed_tasks", "failed"], renderFailed);
+            renderCancelled(data.cancelledTasks);
+            renderFailed(data.failedTasks);
           })
           .catch(() => {
             // Keep the static sample dashboard intact when Pages cannot load JSON.
