@@ -326,6 +326,95 @@
         line-height: 1.5;
       }
 
+      .task-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .task-card {
+        display: grid;
+        gap: 12px;
+        min-width: 0;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      .task-card.soft {
+        background: var(--panel-soft);
+      }
+
+      .task-card p,
+      .task-card h3,
+      .task-card span,
+      .task-card summary,
+      .task-card code {
+        overflow-wrap: anywhere;
+      }
+
+      .task-card h3 {
+        font-size: 1rem;
+        line-height: 1.25;
+      }
+
+      .task-card p {
+        display: -webkit-box;
+        margin: 0;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+      }
+
+      .task-title-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: start;
+      }
+
+      .task-number {
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .task-details {
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.5;
+      }
+
+      .task-details summary {
+        cursor: pointer;
+        color: var(--ink);
+        font-weight: 800;
+      }
+
+      .task-details div {
+        margin-top: 8px;
+        white-space: pre-wrap;
+      }
+
+      .task-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .task-actions a {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--blue-dark);
+        padding: 7px 10px;
+        font-size: 0.82rem;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
       .meta {
         display: flex;
         flex-wrap: wrap;
@@ -369,6 +458,10 @@
       .review-item:first-of-type {
         border-top: 0;
         padding-top: 0;
+      }
+
+      .review-item.task-card:first-of-type {
+        padding-top: 16px;
       }
 
       .actions {
@@ -420,6 +513,10 @@
         padding: 18px 18px 0;
       }
 
+      .table-card > .task-list {
+        padding: 18px;
+      }
+
       table {
         width: 100%;
         border-collapse: collapse;
@@ -443,21 +540,6 @@
       .links {
         display: grid;
         gap: 10px;
-      }
-
-      .deploy-link {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 14px;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        background: var(--panel-soft);
-        text-decoration: none;
-      }
-
-      .deploy-link span {
-        color: var(--muted);
       }
 
       .safety-list {
@@ -512,6 +594,10 @@
         .actions {
           justify-content: flex-start;
           margin-top: 14px;
+        }
+
+        .task-title-row {
+          flex-direction: column;
         }
 
         table,
@@ -686,42 +772,72 @@
           </div>
 
           <div class="grid-3" id="recent-tasks">
-            <article class="card">
-              <div class="card-head">
-                <h3>Task #28: Dashboard</h3>
+            <article class="task-card">
+              <div class="task-title-row">
+                <div>
+                  <div class="task-number">Task #28</div>
+                  <h3>Dashboard</h3>
+                </div>
                 <span class="chip green">running</span>
               </div>
-              <p>LaunchPilot started a dashboard polish branch for <code>jodyswartz/launchpilot-dashboard</code>.</p>
               <div class="meta">
-                <span class="chip">LP-028</span>
-                <span class="chip">docs</span>
-                <span class="chip">2m ago</span>
+                <span class="chip">jodyswartz/launchpilot-dashboard</span>
+                <span class="chip">LaunchPilot</span>
+              </div>
+              <p>LaunchPilot started a dashboard polish branch.</p>
+              <details class="task-details">
+                <summary>Details</summary>
+                <div>LaunchPilot started a dashboard polish branch for jodyswartz/launchpilot-dashboard.</div>
+              </details>
+              <div class="task-actions">
+                <a href="#logs">Logs</a>
+                <a href="#review">Review</a>
               </div>
             </article>
 
-            <article class="card">
-              <div class="card-head">
-                <h3>Task #27: Landing copy</h3>
+            <article class="task-card">
+              <div class="task-title-row">
+                <div>
+                  <div class="task-number">Task #27</div>
+                  <h3>Landing copy</h3>
+                </div>
                 <span class="chip amber">queued</span>
               </div>
-              <p>S.A.G.E. queued issue #118 after the <code>sage-small</code> label was applied.</p>
               <div class="meta">
-                <span class="chip">SAGE-118</span>
-                <span class="chip">frontend</span>
-                <span class="chip">14m ago</span>
+                <span class="chip">jodyswartz/sage-lab</span>
+                <span class="chip">S.A.G.E.</span>
+              </div>
+              <p>S.A.G.E. queued the landing copy issue after label triage.</p>
+              <details class="task-details">
+                <summary>Details</summary>
+                <div>S.A.G.E. queued issue #118 after the sage-small label was applied.</div>
+              </details>
+              <div class="task-actions">
+                <a href="#logs">Logs</a>
+                <a href="#review">Review</a>
               </div>
             </article>
 
-            <article class="card">
-              <div class="card-head">
-                <h3>Task #26: Check wiring</h3>
+            <article class="task-card">
+              <div class="task-title-row">
+                <div>
+                  <div class="task-number">Task #26</div>
+                  <h3>Check wiring</h3>
+                </div>
                 <span class="chip green">ready</span>
               </div>
-              <p>Automated tests and static checks completed for a LaunchPilot branch.</p>
               <div class="meta">
-                <span class="chip">PR #42</span>
-                <span class="chip">checks</span>
-                <span class="chip">31m ago</span>
+                <span class="chip">jodyswartz/launchpilot-dashboard</span>
+                <span class="chip">LaunchPilot</span>
+              </div>
+              <p>Automated tests and static checks completed for the branch.</p>
+              <details class="task-details">
+                <summary>Details</summary>
+                <div>Automated tests and static checks completed for a LaunchPilot branch.</div>
+              </details>
+              <div class="task-actions">
+                <a href="#logs">Logs</a>
+                <a href="#review">Review</a>
               </div>
             </article>
           </div>
@@ -737,36 +853,62 @@
 
           <article class="table-card">
             <h3>Status Board</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Task</th>
-                  <th>Owner</th>
-                  <th>Status</th>
-                  <th>Next Check</th>
-                </tr>
-              </thead>
-              <tbody id="status-board">
-                <tr>
-                  <td>Task #28: Add Mission Control dashboard</td>
-                  <td>LaunchPilot</td>
-                  <td><span class="chip green">building</span></td>
-                  <td>Static HTML review</td>
-                </tr>
-                <tr>
-                  <td>Task #27: Refresh landing copy</td>
-                  <td>LaunchPilot</td>
-                  <td><span class="chip amber">waiting</span></td>
-                  <td>Owner approval</td>
-                </tr>
-                <tr>
-                  <td>Issue #118: Add billing guard copy</td>
-                  <td>S.A.G.E.</td>
-                  <td><span class="chip">queued</span></td>
-                  <td>Label confirmation</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="task-list" id="status-board">
+              <article class="task-card soft">
+                <div class="task-title-row">
+                  <div>
+                    <div class="task-number">Task #28</div>
+                    <h3>Add Mission Control dashboard</h3>
+                  </div>
+                  <span class="chip green">building</span>
+                </div>
+                <div class="meta">
+                  <span class="chip">jodyswartz/launchpilot-dashboard</span>
+                  <span class="chip">LaunchPilot</span>
+                </div>
+                <p>Static HTML review is in progress.</p>
+                <details class="task-details">
+                  <summary>Details</summary>
+                  <div>Task #28: Add Mission Control dashboard. Next check: Static HTML review.</div>
+                </details>
+              </article>
+              <article class="task-card soft">
+                <div class="task-title-row">
+                  <div>
+                    <div class="task-number">Task #27</div>
+                    <h3>Refresh landing copy</h3>
+                  </div>
+                  <span class="chip amber">waiting</span>
+                </div>
+                <div class="meta">
+                  <span class="chip">jodyswartz/launchpilot-dashboard</span>
+                  <span class="chip">LaunchPilot</span>
+                </div>
+                <p>Owner approval is the next step.</p>
+                <details class="task-details">
+                  <summary>Details</summary>
+                  <div>Task #27: Refresh landing copy. Next check: Owner approval.</div>
+                </details>
+              </article>
+              <article class="task-card soft">
+                <div class="task-title-row">
+                  <div>
+                    <div class="task-number">Issue #118</div>
+                    <h3>Add billing guard copy</h3>
+                  </div>
+                  <span class="chip">queued</span>
+                </div>
+                <div class="meta">
+                  <span class="chip">jodyswartz/sage-lab</span>
+                  <span class="chip">S.A.G.E.</span>
+                </div>
+                <p>Label confirmation is pending before implementation.</p>
+                <details class="task-details">
+                  <summary>Details</summary>
+                  <div>Issue #118: Add billing guard copy. Next check: Label confirmation.</div>
+                </details>
+              </article>
+            </div>
           </article>
         </section>
 
@@ -781,15 +923,20 @@
               </div>
 
               <div id="needs-review">
-                <div class="review-item">
+                <div class="review-item task-card soft">
                   <div>
-                    <h3>PR #42: Mission Control dashboard</h3>
-                    <p>Docs-only static page, no runtime secrets, waiting for Telegram approval before LaunchPilot merges.</p>
+                    <div class="task-number">PR #42</div>
+                    <h3>Mission Control dashboard</h3>
                     <div class="meta">
+                      <span class="chip">jodyswartz/launchpilot-dashboard</span>
                       <span class="chip green">LaunchPilot</span>
-                      <span class="chip">docs/index.html</span>
                       <span class="chip amber">awaiting approval</span>
                     </div>
+                    <p>Docs-only static page is waiting for Telegram approval.</p>
+                    <details class="task-details">
+                      <summary>Details</summary>
+                      <div>Docs-only static page, no runtime secrets, waiting for Telegram approval before LaunchPilot merges.</div>
+                    </details>
                   </div>
                   <div class="actions" aria-label="Read-only review actions">
                     <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
@@ -799,15 +946,20 @@
                   </div>
                 </div>
 
-                <div class="review-item">
+                <div class="review-item task-card soft">
                   <div>
-                    <h3>Issue #118: Add billing guard copy</h3>
-                    <p>S.A.G.E. draft waiting for owner review after <code>sage-small</code> triage.</p>
+                    <div class="task-number">Issue #118</div>
+                    <h3>Add billing guard copy</h3>
                     <div class="meta">
+                      <span class="chip">jodyswartz/sage-lab</span>
                       <span class="chip green">S.A.G.E.</span>
                       <span class="chip amber">review</span>
-                      <span class="chip">sage-small</span>
                     </div>
+                    <p>S.A.G.E. draft is waiting for owner review after triage.</p>
+                    <details class="task-details">
+                      <summary>Details</summary>
+                      <div>S.A.G.E. draft waiting for owner review after sage-small triage.</div>
+                    </details>
                   </div>
                   <div class="actions" aria-label="Read-only review actions">
                     <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
@@ -823,18 +975,63 @@
               <h2>Deployment Links</h2>
               <p>After approval, LaunchPilot can merge the PR and post the live Vercel or GitHub Pages website link.</p>
               <div class="links" id="deployment-links" aria-label="Deployment links">
-                <a class="deploy-link" href="#review">
-                  <strong>GitHub Pages Preview</strong>
-                  <span>website link</span>
-                </a>
-                <a class="deploy-link" href="#logs">
-                  <strong>Vercel Preview</strong>
-                  <span>website link</span>
-                </a>
-                <a class="deploy-link" href="#workflows">
-                  <strong>GitHub Pages Production</strong>
-                  <span>after merge</span>
-                </a>
+                <article class="task-card soft">
+                  <div class="task-title-row">
+                    <div>
+                      <div class="task-number">Task #28</div>
+                      <h3>GitHub Pages Preview</h3>
+                    </div>
+                    <span class="chip green">website link</span>
+                  </div>
+                  <div class="meta">
+                    <span class="chip">jodyswartz/launchpilot-dashboard</span>
+                    <span class="chip">LaunchPilot</span>
+                  </div>
+                  <p>Preview link for the dashboard polish branch.</p>
+                  <details class="task-details">
+                    <summary>Details</summary>
+                    <div>LaunchPilot can post the GitHub Pages preview after approval.</div>
+                  </details>
+                  <div class="task-actions"><a href="#review">Open link</a></div>
+                </article>
+                <article class="task-card soft">
+                  <div class="task-title-row">
+                    <div>
+                      <div class="task-number">Task #28</div>
+                      <h3>Vercel Preview</h3>
+                    </div>
+                    <span class="chip green">website link</span>
+                  </div>
+                  <div class="meta">
+                    <span class="chip">jodyswartz/launchpilot-dashboard</span>
+                    <span class="chip">LaunchPilot</span>
+                  </div>
+                  <p>Preview deployment link for review.</p>
+                  <details class="task-details">
+                    <summary>Details</summary>
+                    <div>LaunchPilot can share the Vercel preview website link while the task is in review.</div>
+                  </details>
+                  <div class="task-actions"><a href="#logs">Open link</a></div>
+                </article>
+                <article class="task-card soft">
+                  <div class="task-title-row">
+                    <div>
+                      <div class="task-number">Task #26</div>
+                      <h3>GitHub Pages Production</h3>
+                    </div>
+                    <span class="chip amber">after merge</span>
+                  </div>
+                  <div class="meta">
+                    <span class="chip">jodyswartz/launchpilot-dashboard</span>
+                    <span class="chip">LaunchPilot</span>
+                  </div>
+                  <p>Production link is available after merge.</p>
+                  <details class="task-details">
+                    <summary>Details</summary>
+                    <div>After approval, LaunchPilot can merge the PR and post the live GitHub Pages website link.</div>
+                  </details>
+                  <div class="task-actions"><a href="#workflows">Open link</a></div>
+                </article>
               </div>
             </article>
           </div>
@@ -1102,6 +1299,7 @@
           if (node) node.innerHTML = html;
         };
         const emptyCards = (text) => `<article class="card"><p>${escape(text)}</p></article>`;
+        const emptyTaskCards = (text) => `<article class="task-card"><p>${escape(text)}</p></article>`;
         const emptyRows = (colspan = 3, text = "No items to show.") =>
           `<tr><td colspan="${colspan}">${escape(text)}</td></tr>`;
         const safeHref = (href = "#") => {
@@ -1148,10 +1346,15 @@
           isStaleRunningTask(task) ? "" : task.codexStatus ?? task.codex_status ?? "",
         ].join(" ")).toLowerCase();
         const taskId = (task) => task.displayId ?? task.display_id ?? task.key ?? task.id ?? "";
+        const taskSource = (task) => task.agent ?? task.owner ?? task.source ?? "LaunchPilot";
+        const taskRepo = (task) => task.repo ?? task.repository ?? task.repo_name ?? "";
         const taskLabel = (task) => {
           const id = taskId(task);
           if (!id) return "";
-          return /^\d+$/.test(String(id)) ? `Task #${id}` : String(id);
+          const text = String(id);
+          const taskNumber = text.match(/^task[-_\s]*(\d+)$/i);
+          if (taskNumber) return `Task #${taskNumber[1]}`;
+          return /^\d+$/.test(text) ? `Task #${text}` : text;
         };
         const taskTitle = (task) => typeof task === "string"
           ? task
@@ -1160,7 +1363,70 @@
               ? `${taskLabel(task)}: ${task.idea}`
               : task.idea ?? taskLabel(task) ?? "Untitled task"
           );
-        const taskSummary = (task) => task.description ?? task.summary ?? task.repo ?? task.repository ?? task.idea ?? "";
+        const taskSummary = (task) => task.summary ?? task.description ?? task.repo ?? task.repository ?? task.idea ?? "";
+        const taskPrompt = (task) =>
+          task.prompt ?? task.originalPrompt ?? task.original_prompt ?? task.fullPrompt ?? task.full_prompt ??
+          task.description ?? task.summary ?? task.idea ?? taskTitle(task);
+        const compactTitle = (task) => {
+          const label = taskLabel(task);
+          const title = String(taskTitle(task));
+          const stripped = label
+            ? title.replace(new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[:\\-–]?\\s*`, "i"), "")
+            : title.replace(/^(task|issue|pr)\s*#?\w+\s*[:\-–]?\s*/i, "");
+          return stripped || title || "Untitled task";
+        };
+        const displayTaskNumber = (task) => {
+          const title = String(taskTitle(task));
+          return taskLabel(task) || title.match(/\b(?:Task|Issue|PR)\s*#?\w+/i)?.[0] || "Task";
+        };
+        const oneSentence = (value = "") => {
+          const text = String(value || "").replace(/\s+/g, " ").trim();
+          if (!text) return "";
+          const sentence = text.match(/^.{1,180}?[.!?](?:\s|$)/);
+          return sentence ? sentence[0].trim() : `${text.slice(0, 177).trim()}${text.length > 177 ? "..." : ""}`;
+        };
+        const taskLinks = (task) => {
+          const links = [
+            { href: task.preview_url ?? task.previewUrl, label: "Preview" },
+            { href: task.website_url ?? task.websiteUrl ?? task.deployment_url ?? task.deploymentUrl, label: "Website" },
+            { href: task.pr_url ?? task.prUrl ?? task.pull_request_url, label: "Pull request" },
+            { href: task.logs_url ?? task.logsUrl ?? task.log_url, label: "Logs" },
+          ];
+          const availableLinks = links.filter((link) => link.href);
+          return availableLinks.length
+            ? availableLinks
+            : [{ href: "#logs", label: "Logs" }, { href: "#review", label: "Review" }];
+        };
+        const renderTaskCard = (task, options = {}) => {
+          const item = task && typeof task === "object" ? task : { title: task ?? "Untitled task" };
+          const status = options.status ?? effectiveTaskStatus(item);
+          const summary = oneSentence(options.summary ?? taskSummary(item) ?? taskPrompt(item));
+          const repo = options.repo ?? taskRepo(item);
+          const source = options.source ?? taskSource(item);
+          const links = options.links ?? taskLinks(item);
+          return `
+            <article class="task-card${options.soft ? " soft" : ""}">
+              <div class="task-title-row">
+                <div>
+                  <div class="task-number">${escape(options.number ?? displayTaskNumber(item))}</div>
+                  <h3>${escape(options.title ?? compactTitle(item))}</h3>
+                </div>
+                ${chip(status)}
+              </div>
+              <div class="meta">
+                ${[repo, source].filter(Boolean).map((entry) => chip(entry)).join("")}
+              </div>
+              <p>${escape(summary || "No summary available.")}</p>
+              <details class="task-details">
+                <summary>Details</summary>
+                <div>${escape(taskPrompt(item))}</div>
+              </details>
+              ${links.length ? `<div class="task-actions">${links.map((link) =>
+                `<a href="${escape(safeHref(link.href))}">${escape(link.label)}</a>`
+              ).join("")}</div>` : ""}
+            </article>
+          `;
+        };
         const latestLogMessage = (task, fallback = "") => {
           const logs = asArray(task.logs);
           const log = logs[logs.length - 1];
@@ -1201,19 +1467,14 @@
             { value: formatTimestamp(data.generated_at) || "unknown", label: "last updated" },
           ];
           data.recentTasks = sortedTasks.slice(0, 3);
-          data.statusBoard = sortedTasks.map((task) => ({
-            task: taskTitle(task),
-            owner: task.owner ?? task.agent ?? task.source ?? "LaunchPilot",
-            status: effectiveTaskStatus(task),
-            nextCheck: formatTimestamp(taskUpdatedAt(task)) || taskUpdatedAt(task),
-          }));
+          data.statusBoard = sortedTasks;
           data.needsReview = reviewTasks;
           data.deploymentLinks = sortedTasks.flatMap((task) => [
             { url: task.preview_url, label: "website link" },
             { url: task.pr_url, label: "pull request" },
           ]
             .filter((link) => link.url)
-            .map((link) => ({ title: taskTitle(task), ...link }))
+            .map((link) => ({ task, title: taskTitle(task), repo: taskRepo(task), source: taskSource(task), status: effectiveTaskStatus(task), ...link }))
           ).slice(0, 12);
           data.latestLogs = tasks.flatMap((task) => asArray(task.logs).map((log) => ({
             ...log,
@@ -1256,46 +1517,39 @@
         };
 
         const renderRecentTasks = (tasks) => {
-          setHTML("recent-tasks", asArray(tasks).map((task) => `
-            <article class="card">
-              <div class="card-head">
-                <h3>${escape(taskTitle(task))}</h3>
-                ${chip(effectiveTaskStatus(task))}
-              </div>
-              <p>${escape(taskSummary(task))}</p>
-              <div class="meta">
-                ${(asArray(task.meta ?? task.tags).length
-                  ? asArray(task.meta ?? task.tags)
-                  : [task.repo ?? task.repository, task.risk, task.updatedAt ?? task.updated_at].filter(Boolean)
-                ).map((item) => chip(item)).join("")}
-              </div>
-            </article>
-          `).join("") || emptyCards("No recent tasks."));
+          setHTML("recent-tasks", asArray(tasks).map((task) =>
+            renderTaskCard(task)
+          ).join("") || emptyTaskCards("No recent tasks."));
         };
 
         const renderStatusBoard = (tasks) => {
-          setHTML("status-board", asArray(tasks).map((task) => `
-            <tr>
-              <td>${escape(task.task ?? task.title ?? task.name ?? "Untitled task")}</td>
-              <td>${escape(task.owner ?? task.agent ?? "")}</td>
-              <td>${chip(task.status ?? "unknown")}</td>
-              <td>${escape(task.nextCheck ?? task.next_check ?? task.next ?? "")}</td>
-            </tr>
-          `).join("") || emptyRows(4, "No status updates."));
+          setHTML("status-board", asArray(tasks).map((task) => {
+            const item = task && typeof task === "object" ? task : { title: task ?? "" };
+            const status = effectiveTaskStatus(item);
+            const nextCheck = item.nextCheck ?? item.next_check ?? item.next ?? (formatTimestamp(taskUpdatedAt(item)) || taskUpdatedAt(item));
+            return renderTaskCard(item, {
+              soft: true,
+              status,
+              source: item.owner ?? item.agent ?? item.source ?? "LaunchPilot",
+              summary: nextCheck ? `Next check: ${nextCheck}.` : taskSummary(item),
+            });
+          }).join("") || emptyTaskCards("No status updates."));
         };
 
         const renderReviews = (reviews) => {
           setHTML("needs-review", asArray(reviews).map((item) => `
-            <div class="review-item">
+            <div class="review-item task-card soft">
               <div>
-                <h3>${escape(taskTitle(item))}</h3>
-                <p>${escape(taskSummary(item))}</p>
+                <div class="task-number">${escape(displayTaskNumber(item))}</div>
+                <h3>${escape(compactTitle(item))}</h3>
                 <div class="meta">
-                  ${(asArray(item.meta ?? item.tags).length
-                    ? asArray(item.meta ?? item.tags)
-                    : [item.agent ?? item.owner ?? "LaunchPilot", item.repo ?? item.repository, effectiveTaskStatus(item)].filter(Boolean)
-                  ).map((entry) => chip(entry)).join("")}
+                  ${[taskRepo(item), taskSource(item), effectiveTaskStatus(item)].filter(Boolean).map((entry) => chip(entry)).join("")}
                 </div>
+                <p>${escape(oneSentence(taskSummary(item) || taskPrompt(item)) || "No summary available.")}</p>
+                <details class="task-details">
+                  <summary>Details</summary>
+                  <div>${escape(taskPrompt(item))}</div>
+                </details>
               </div>
               <div class="actions" aria-label="Read-only review actions">
                 <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
@@ -1310,12 +1564,16 @@
         const renderDeploymentLinks = (links) => {
           setHTML("deployment-links", asArray(links).map((link) => {
             const item = link && typeof link === "object" ? link : { url: link ?? "", title: link ?? "Deployment" };
-            return `
-            <a class="deploy-link" href="${escape(safeHref(item.href ?? item.url))}">
-              <strong>${escape(item.title ?? item.name ?? "Deployment")}</strong>
-              <span>${escape(item.label ?? item.status ?? item.description ?? "website link")}</span>
-            </a>
-          `;
+            const task = item.task && typeof item.task === "object" ? item.task : item;
+            return renderTaskCard(task, {
+              soft: true,
+              title: item.name ?? compactTitle(task) ?? item.label ?? "Deployment",
+              status: item.label ?? item.status ?? "website link",
+              repo: item.repo ?? taskRepo(task),
+              source: item.source ?? taskSource(task),
+              summary: item.description ?? taskSummary(task),
+              links: [{ href: item.href ?? item.url, label: "Open link" }],
+            });
           }).join("") || '<p>No deployment links available.</p>');
         };
 
