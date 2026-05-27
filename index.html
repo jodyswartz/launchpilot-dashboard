@@ -334,7 +334,9 @@
       .task-card {
         display: grid;
         gap: 12px;
+        align-content: start;
         min-width: 0;
+        overflow: hidden;
         padding: 16px;
         border: 1px solid var(--line);
         border-radius: 8px;
@@ -354,6 +356,12 @@
       }
 
       .task-card h3 {
+        display: -webkit-box;
+        margin-top: 2px;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
         font-size: 1rem;
         line-height: 1.25;
       }
@@ -364,6 +372,7 @@
         overflow: hidden;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 3;
+        line-clamp: 3;
       }
 
       .task-title-row {
@@ -371,6 +380,10 @@
         justify-content: space-between;
         gap: 12px;
         align-items: start;
+      }
+
+      .task-title-row > div {
+        min-width: 0;
       }
 
       .task-number {
@@ -382,6 +395,10 @@
       }
 
       .task-details {
+        max-width: 100%;
+        min-width: 0;
+        border-top: 1px solid var(--line);
+        padding-top: 10px;
         color: var(--muted);
         font-size: 0.88rem;
         line-height: 1.5;
@@ -391,10 +408,14 @@
         cursor: pointer;
         color: var(--ink);
         font-weight: 800;
+        list-style-position: inside;
       }
 
       .task-details div {
         margin-top: 8px;
+        max-height: 260px;
+        overflow: auto;
+        overflow-wrap: anywhere;
         white-space: pre-wrap;
       }
 
@@ -405,6 +426,8 @@
       }
 
       .task-actions a {
+        max-width: 100%;
+        overflow: hidden;
         border: 1px solid var(--line);
         border-radius: 8px;
         background: #ffffff;
@@ -413,22 +436,28 @@
         font-size: 0.82rem;
         font-weight: 800;
         text-decoration: none;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .meta {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin-top: 14px;
+        min-width: 0;
       }
 
       .chip {
+        max-width: 100%;
+        overflow: hidden;
         border-radius: 999px;
         background: #eef2f7;
         color: #39465a;
         padding: 6px 9px;
         font-size: 0.78rem;
         font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .chip.green {
@@ -462,6 +491,12 @@
 
       .review-item.task-card:first-of-type {
         padding-top: 16px;
+      }
+
+      .review-item.task-card {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
+        padding: 16px;
       }
 
       .actions {
@@ -786,7 +821,7 @@
               </div>
               <p>LaunchPilot started a dashboard polish branch.</p>
               <details class="task-details">
-                <summary>Details</summary>
+                <summary>View details</summary>
                 <div>LaunchPilot started a dashboard polish branch for jodyswartz/launchpilot-dashboard.</div>
               </details>
               <div class="task-actions">
@@ -809,7 +844,7 @@
               </div>
               <p>S.A.G.E. queued the landing copy issue after label triage.</p>
               <details class="task-details">
-                <summary>Details</summary>
+                <summary>View details</summary>
                 <div>S.A.G.E. queued issue #118 after the sage-small label was applied.</div>
               </details>
               <div class="task-actions">
@@ -832,7 +867,7 @@
               </div>
               <p>Automated tests and static checks completed for the branch.</p>
               <details class="task-details">
-                <summary>Details</summary>
+                <summary>View details</summary>
                 <div>Automated tests and static checks completed for a LaunchPilot branch.</div>
               </details>
               <div class="task-actions">
@@ -868,9 +903,13 @@
                 </div>
                 <p>Static HTML review is in progress.</p>
                 <details class="task-details">
-                  <summary>Details</summary>
+                  <summary>View details</summary>
                   <div>Task #28: Add Mission Control dashboard. Next check: Static HTML review.</div>
                 </details>
+                <div class="task-actions">
+                  <a href="#logs">Logs</a>
+                  <a href="#review">Review</a>
+                </div>
               </article>
               <article class="task-card soft">
                 <div class="task-title-row">
@@ -886,9 +925,13 @@
                 </div>
                 <p>Owner approval is the next step.</p>
                 <details class="task-details">
-                  <summary>Details</summary>
+                  <summary>View details</summary>
                   <div>Task #27: Refresh landing copy. Next check: Owner approval.</div>
                 </details>
+                <div class="task-actions">
+                  <a href="#logs">Logs</a>
+                  <a href="#review">Review</a>
+                </div>
               </article>
               <article class="task-card soft">
                 <div class="task-title-row">
@@ -904,9 +947,13 @@
                 </div>
                 <p>Label confirmation is pending before implementation.</p>
                 <details class="task-details">
-                  <summary>Details</summary>
+                  <summary>View details</summary>
                   <div>Issue #118: Add billing guard copy. Next check: Label confirmation.</div>
                 </details>
+                <div class="task-actions">
+                  <a href="#logs">Logs</a>
+                  <a href="#review">Review</a>
+                </div>
               </article>
             </div>
           </article>
@@ -924,48 +971,50 @@
 
               <div id="needs-review">
                 <div class="review-item task-card soft">
-                  <div>
-                    <div class="task-number">PR #42</div>
-                    <h3>Mission Control dashboard</h3>
-                    <div class="meta">
-                      <span class="chip">jodyswartz/launchpilot-dashboard</span>
-                      <span class="chip green">LaunchPilot</span>
-                      <span class="chip amber">awaiting approval</span>
+                  <div class="task-title-row">
+                    <div>
+                      <div class="task-number">PR #42</div>
+                      <h3>Mission Control dashboard</h3>
                     </div>
-                    <p>Docs-only static page is waiting for Telegram approval.</p>
-                    <details class="task-details">
-                      <summary>Details</summary>
-                      <div>Docs-only static page, no runtime secrets, waiting for Telegram approval before LaunchPilot merges.</div>
-                    </details>
+                    <span class="chip amber">awaiting approval</span>
                   </div>
-                  <div class="actions" aria-label="Read-only review actions">
-                    <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
-                    <button class="button danger" type="button" aria-disabled="true" disabled>Cancel in Telegram</button>
-                    <button class="button primary" type="button" aria-disabled="true" disabled>Approve in Telegram</button>
-                    <button class="button" type="button" aria-disabled="true" disabled>Merge in Telegram</button>
+                  <div class="meta">
+                    <span class="chip">jodyswartz/launchpilot-dashboard</span>
+                    <span class="chip green">LaunchPilot</span>
+                  </div>
+                  <p>Docs-only static page is waiting for Telegram approval.</p>
+                  <details class="task-details">
+                    <summary>View details</summary>
+                    <div>Docs-only static page, no runtime secrets, waiting for Telegram approval before LaunchPilot merges.</div>
+                  </details>
+                  <div class="task-actions" aria-label="Review action links">
+                    <a href="#logs">Logs</a>
+                    <a href="#review">Review in Telegram</a>
+                    <a href="#review">Merge in Telegram</a>
                   </div>
                 </div>
 
                 <div class="review-item task-card soft">
-                  <div>
-                    <div class="task-number">Issue #118</div>
-                    <h3>Add billing guard copy</h3>
-                    <div class="meta">
-                      <span class="chip">jodyswartz/sage-lab</span>
-                      <span class="chip green">S.A.G.E.</span>
-                      <span class="chip amber">review</span>
+                  <div class="task-title-row">
+                    <div>
+                      <div class="task-number">Issue #118</div>
+                      <h3>Add billing guard copy</h3>
                     </div>
-                    <p>S.A.G.E. draft is waiting for owner review after triage.</p>
-                    <details class="task-details">
-                      <summary>Details</summary>
-                      <div>S.A.G.E. draft waiting for owner review after sage-small triage.</div>
-                    </details>
+                    <span class="chip amber">review</span>
                   </div>
-                  <div class="actions" aria-label="Read-only review actions">
-                    <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
-                    <button class="button danger" type="button" aria-disabled="true" disabled>Cancel in Telegram</button>
-                    <button class="button primary" type="button" aria-disabled="true" disabled>Approve in Telegram</button>
-                    <button class="button" type="button" aria-disabled="true" disabled>Merge in Telegram</button>
+                  <div class="meta">
+                    <span class="chip">jodyswartz/sage-lab</span>
+                    <span class="chip green">S.A.G.E.</span>
+                  </div>
+                  <p>S.A.G.E. draft is waiting for owner review after triage.</p>
+                  <details class="task-details">
+                    <summary>View details</summary>
+                    <div>S.A.G.E. draft waiting for owner review after sage-small triage.</div>
+                  </details>
+                  <div class="task-actions" aria-label="Review action links">
+                    <a href="#logs">Logs</a>
+                    <a href="#review">Review in Telegram</a>
+                    <a href="#review">Merge in Telegram</a>
                   </div>
                 </div>
               </div>
@@ -989,7 +1038,7 @@
                   </div>
                   <p>Preview link for the dashboard polish branch.</p>
                   <details class="task-details">
-                    <summary>Details</summary>
+                    <summary>View details</summary>
                     <div>LaunchPilot can post the GitHub Pages preview after approval.</div>
                   </details>
                   <div class="task-actions"><a href="#review">Open link</a></div>
@@ -1008,7 +1057,7 @@
                   </div>
                   <p>Preview deployment link for review.</p>
                   <details class="task-details">
-                    <summary>Details</summary>
+                    <summary>View details</summary>
                     <div>LaunchPilot can share the Vercel preview website link while the task is in review.</div>
                   </details>
                   <div class="task-actions"><a href="#logs">Open link</a></div>
@@ -1027,7 +1076,7 @@
                   </div>
                   <p>Production link is available after merge.</p>
                   <details class="task-details">
-                    <summary>Details</summary>
+                    <summary>View details</summary>
                     <div>After approval, LaunchPilot can merge the PR and post the live GitHub Pages website link.</div>
                   </details>
                   <div class="task-actions"><a href="#workflows">Open link</a></div>
@@ -1363,7 +1412,12 @@
               ? `${taskLabel(task)}: ${task.idea}`
               : task.idea ?? taskLabel(task) ?? "Untitled task"
           );
-        const taskSummary = (task) => task.summary ?? task.description ?? task.repo ?? task.repository ?? task.idea ?? "";
+        const shortText = (value = "", max = 76) => {
+          const text = String(value || "").replace(/\s+/g, " ").trim();
+          if (text.length <= max) return text;
+          return `${text.slice(0, max - 3).trim()}...`;
+        };
+        const taskSummary = (task) => task.summary ?? task.shortSummary ?? task.short_summary ?? task.description ?? task.repo ?? task.repository ?? task.idea ?? "";
         const taskPrompt = (task) =>
           task.prompt ?? task.originalPrompt ?? task.original_prompt ?? task.fullPrompt ?? task.full_prompt ??
           task.description ?? task.summary ?? task.idea ?? taskTitle(task);
@@ -1373,7 +1427,7 @@
           const stripped = label
             ? title.replace(new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*[:\\-–]?\\s*`, "i"), "")
             : title.replace(/^(task|issue|pr)\s*#?\w+\s*[:\-–]?\s*/i, "");
-          return stripped || title || "Untitled task";
+          return shortText(stripped || title || "Untitled task");
         };
         const displayTaskNumber = (task) => {
           const title = String(taskTitle(task));
@@ -1409,7 +1463,7 @@
               <div class="task-title-row">
                 <div>
                   <div class="task-number">${escape(options.number ?? displayTaskNumber(item))}</div>
-                  <h3>${escape(options.title ?? compactTitle(item))}</h3>
+                  <h3>${escape(shortText(options.title ?? compactTitle(item)))}</h3>
                 </div>
                 ${chip(status)}
               </div>
@@ -1418,7 +1472,7 @@
               </div>
               <p>${escape(summary || "No summary available.")}</p>
               <details class="task-details">
-                <summary>Details</summary>
+                <summary>View details</summary>
                 <div>${escape(taskPrompt(item))}</div>
               </details>
               ${links.length ? `<div class="task-actions">${links.map((link) =>
@@ -1537,28 +1591,33 @@
         };
 
         const renderReviews = (reviews) => {
-          setHTML("needs-review", asArray(reviews).map((item) => `
-            <div class="review-item task-card soft">
-              <div>
-                <div class="task-number">${escape(displayTaskNumber(item))}</div>
-                <h3>${escape(compactTitle(item))}</h3>
+          setHTML("needs-review", asArray(reviews).map((item) => {
+            const links = taskLinks(item);
+            return `
+              <div class="review-item task-card soft">
+                <div class="task-title-row">
+                  <div>
+                    <div class="task-number">${escape(displayTaskNumber(item))}</div>
+                    <h3>${escape(compactTitle(item))}</h3>
+                  </div>
+                  ${chip(effectiveTaskStatus(item))}
+                </div>
                 <div class="meta">
-                  ${[taskRepo(item), taskSource(item), effectiveTaskStatus(item)].filter(Boolean).map((entry) => chip(entry)).join("")}
+                  ${[taskRepo(item), taskSource(item)].filter(Boolean).map((entry) => chip(entry)).join("")}
                 </div>
                 <p>${escape(oneSentence(taskSummary(item) || taskPrompt(item)) || "No summary available.")}</p>
                 <details class="task-details">
-                  <summary>Details</summary>
+                  <summary>View details</summary>
                   <div>${escape(taskPrompt(item))}</div>
                 </details>
+                <div class="task-actions" aria-label="Review action links">
+                  ${links.map((link) =>
+                    `<a href="${escape(safeHref(link.href))}">${escape(link.label)}</a>`
+                  ).join("")}
+                </div>
               </div>
-              <div class="actions" aria-label="Read-only review actions">
-                <button class="button" type="button" aria-disabled="true" disabled>Logs</button>
-                <button class="button danger" type="button" aria-disabled="true" disabled>Cancel in Telegram</button>
-                <button class="button primary" type="button" aria-disabled="true" disabled>Approve in Telegram</button>
-                <button class="button" type="button" aria-disabled="true" disabled>Merge in Telegram</button>
-              </div>
-            </div>
-          `).join("") || '<p>No tasks currently need review.</p>');
+            `;
+          }).join("") || '<p>No tasks currently need review.</p>');
         };
 
         const renderDeploymentLinks = (links) => {
@@ -1567,7 +1626,7 @@
             const task = item.task && typeof item.task === "object" ? item.task : item;
             return renderTaskCard(task, {
               soft: true,
-              title: item.name ?? compactTitle(task) ?? item.label ?? "Deployment",
+              title: item.name ?? item.title ?? compactTitle(task) ?? item.label ?? "Deployment",
               status: item.label ?? item.status ?? "website link",
               repo: item.repo ?? taskRepo(task),
               source: item.source ?? taskSource(task),
