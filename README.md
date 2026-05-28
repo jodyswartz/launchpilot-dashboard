@@ -13,8 +13,9 @@ https://raw.githubusercontent.com/jodyswartz/launchpilot-data/main/tasks.json
 ```
 
 Private repository tasks are filtered out by LaunchPilot before `tasks.json` is
-published. The dashboard only renders the public data it receives; it does not
-perform private-repo filtering in browser JavaScript. If that JSON cannot be
+published, so `tasks.json` should already contain only public task data. The
+dashboard only renders the public data it receives; it does not perform
+private-repo filtering in browser JavaScript. If that JSON cannot be
 loaded, the page should keep rendering the fallback sample data already embedded
 in `index.html`.
 

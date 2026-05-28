@@ -1,0 +1,3 @@
+Updated the copy in [README.md](/workspaces/task-55/repo/README.md:15) and [index.html](/workspaces/task-55/repo/index.html:803) to clarify that LaunchPilot filters private repo tasks before publishing `tasks.json`, and the dashboard only renders the resulting public feed.
+
+No dashboard JavaScript filtering was added or changed, so the existing fallback sample data behavior remains intact. Tests not run; this was a copy-only change.
