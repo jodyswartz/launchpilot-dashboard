@@ -801,7 +801,11 @@
           <div class="section-head">
             <div>
               <h2>Recent Tasks</h2>
-              <p>Task queue shown for dashboard layout and operator scanning.</p>
+              <p>
+                Public task queue shown for dashboard layout and operator
+                scanning. LaunchPilot filters private repository tasks before
+                publishing <code>tasks.json</code>.
+              </p>
             </div>
             <span class="badge">Dashboard data</span>
           </div>
@@ -1090,7 +1094,11 @@
           <div class="section-head">
             <div>
               <h2>Latest Logs</h2>
-              <p>Run output for quick triage. The dashboard loads logs from JSON when available.</p>
+              <p>
+                Run output for quick triage. The dashboard loads logs from the
+                public JSON published after LaunchPilot filters private
+                repository tasks.
+              </p>
             </div>
           </div>
 
