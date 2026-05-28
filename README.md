@@ -5,15 +5,18 @@ LaunchPilot. This repository is not the LaunchPilot bot backend and does not
 run Telegram commands, GitHub automation, workers, queues, or deployment
 services.
 
-The production page is served from `index.html`. It fetches sanitized task data
-from:
+The production page is served from `index.html`. It fetches sanitized public
+task data from:
 
 ```text
 https://raw.githubusercontent.com/jodyswartz/launchpilot-data/main/tasks.json
 ```
 
-If that JSON cannot be loaded, the page should keep rendering the fallback
-sample data already embedded in `index.html`.
+Private repository tasks are filtered out by LaunchPilot before `tasks.json` is
+published. The dashboard only renders the public data it receives; it does not
+perform private-repo filtering in browser JavaScript. If that JSON cannot be
+loaded, the page should keep rendering the fallback sample data already embedded
+in `index.html`.
 
 ## What it tracks
 
