@@ -18,6 +18,9 @@ dashboard only renders the public data it receives; it does not perform
 private-repo filtering in browser JavaScript. If that JSON cannot be
 loaded, the page should keep rendering the fallback sample data already embedded
 in `index.html`.
+The public dashboard only displays tasks exported by LaunchPilot, and private
+repository tasks are intentionally filtered out before `tasks.json` is
+published.
 
 ## What it tracks
 
