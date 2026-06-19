@@ -890,9 +890,9 @@
               <h2>Connected Public Repos</h2>
               <p>
                 Public repositories connected to LaunchPilot or S.A.G.E. from
-                whitelist fields in <code>tasks.json</code>. Private
-                repositories may exist in the whitelist but are filtered out
-                before display.
+                the top-level <code>whitelistedRepos</code> array in
+                <code>tasks.json</code>. Private repositories are filtered out
+                before publishing.
               </p>
             </div>
             <span class="badge">Whitelist data</span>
@@ -911,22 +911,7 @@
               </thead>
               <tbody id="connected-public-repos">
                 <tr>
-                  <td><code>jodyswartz/launchpilot-dashboard</code></td>
-                  <td><span class="chip green">LaunchPilot</span></td>
-                  <td>Docs, dashboard UI, and GitHub Pages previews.</td>
-                  <td><a href="https://github.com/jodyswartz/launchpilot-dashboard">GitHub</a></td>
-                </tr>
-                <tr>
-                  <td><code>jodyswartz/sage-lab</code></td>
-                  <td><span class="chip green">S.A.G.E.</span></td>
-                  <td>Labeled issue patches with owner review.</td>
-                  <td><a href="https://github.com/jodyswartz/sage-lab">GitHub</a></td>
-                </tr>
-                <tr>
-                  <td><code>jodyswartz/automation-playground</code></td>
-                  <td><span class="chip">Both</span></td>
-                  <td>Sandbox runs, test fixtures, and cleanup drills.</td>
-                  <td><a href="https://github.com/jodyswartz/automation-playground">GitHub</a></td>
+                  <td colspan="4">No connected public repositories found in the published whitelist.</td>
                 </tr>
               </tbody>
             </table>
@@ -1339,15 +1324,6 @@
     <script>
       (() => {
         const DATA_URL = "https://raw.githubusercontent.com/jodyswartz/launchpilot-data/main/tasks.json";
-        const WHITELIST_FIELDS = [
-          "whitelistedRepos",
-          "whitelisted_repos",
-          "publicWhitelist",
-          "public_whitelist",
-          "allowedRepos",
-          "allowed_repos",
-          "repos",
-        ];
         const statusClass = (value = "") => {
           const text = String(value).toLowerCase();
           if (/(ready|running|building|merged|open|complete|archived|allowed|approved|success)/.test(text)) {
@@ -1760,7 +1736,7 @@
                 <td>${link ? `<a href="${escape(safeHref(link))}">${escape(/github\.com/i.test(link) ? "GitHub" : "Website")}</a>` : ""}</td>
               </tr>
             `;
-          }).join("") || emptyRows(4, "No connected public repositories."));
+          }).join("") || emptyRows(4, "No connected public repositories found in the published whitelist."));
         };
 
         const renderLabels = (labels) => {
@@ -1816,7 +1792,7 @@
             renderDeploymentLinks(data.deploymentLinks);
             renderLogs(data.latestLogs);
             renderCleanup(data.cleanupQueue);
-            renderIfPresent(data, WHITELIST_FIELDS, renderPublicRepos);
+            renderPublicRepos(data.whitelistedRepos);
             renderIfPresent(data, ["supportedLabels", "supported_labels", "labels"], renderLabels);
             renderCancelled(data.cancelledTasks);
             renderFailed(data.failedTasks);

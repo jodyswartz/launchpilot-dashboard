@@ -14,10 +14,12 @@ https://raw.githubusercontent.com/jodyswartz/launchpilot-data/main/tasks.json
 
 Private repository tasks are filtered out by LaunchPilot before `tasks.json` is
 published, so `tasks.json` should already contain only public task data. The
-dashboard only renders the public data it receives; it does not perform
-private-repo filtering in browser JavaScript. If that JSON cannot be
-loaded, the page should keep rendering the fallback sample data already embedded
-in `index.html`.
+dashboard renders the public data it receives and defensively ignores any
+private-marked whitelist records. If that JSON cannot be loaded, the page
+should keep rendering the fallback sample data already embedded in `index.html`.
+Connected public repositories are rendered only from the top-level
+`whitelistedRepos` array exported from the real LaunchPilot/S.A.G.E. whitelist
+configuration. Task history does not imply repository access.
 The public dashboard only displays tasks exported by LaunchPilot, and private
 repository tasks are intentionally filtered out before `tasks.json` is
 published.
