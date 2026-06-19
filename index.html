@@ -672,6 +672,7 @@
             <nav aria-label="Dashboard sections">
               <a href="#workflows">Workflows</a>
               <a href="#tasks">Tasks</a>
+              <a href="#repos">Repos</a>
               <a href="#review">Needs Review</a>
               <a href="#logs">Logs</a>
               <a href="#cleanup">Cleanup</a>
@@ -881,6 +882,55 @@
               </div>
             </article>
           </div>
+        </section>
+
+        <section class="section" id="repos">
+          <div class="section-head">
+            <div>
+              <h2>Connected Public Repos</h2>
+              <p>
+                Public repositories connected to LaunchPilot or S.A.G.E. from
+                whitelist fields in <code>tasks.json</code>. Private
+                repositories may exist in the whitelist but are filtered out
+                before display.
+              </p>
+            </div>
+            <span class="badge">Whitelist data</span>
+          </div>
+
+          <article class="table-card">
+            <h3>Public Repository Access</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Repository</th>
+                  <th>Agent</th>
+                  <th>Allowed Work</th>
+                  <th>Link</th>
+                </tr>
+              </thead>
+              <tbody id="connected-public-repos">
+                <tr>
+                  <td><code>jodyswartz/launchpilot-dashboard</code></td>
+                  <td><span class="chip green">LaunchPilot</span></td>
+                  <td>Docs, dashboard UI, and GitHub Pages previews.</td>
+                  <td><a href="https://github.com/jodyswartz/launchpilot-dashboard">GitHub</a></td>
+                </tr>
+                <tr>
+                  <td><code>jodyswartz/sage-lab</code></td>
+                  <td><span class="chip green">S.A.G.E.</span></td>
+                  <td>Labeled issue patches with owner review.</td>
+                  <td><a href="https://github.com/jodyswartz/sage-lab">GitHub</a></td>
+                </tr>
+                <tr>
+                  <td><code>jodyswartz/automation-playground</code></td>
+                  <td><span class="chip">Both</span></td>
+                  <td>Sandbox runs, test fixtures, and cleanup drills.</td>
+                  <td><a href="https://github.com/jodyswartz/automation-playground">GitHub</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </article>
         </section>
 
         <section class="section" id="status">
@@ -1177,36 +1227,6 @@
             </article>
 
             <article class="table-card">
-              <h3>Whitelisted Repos</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Repository</th>
-                    <th>Allowed Work</th>
-                    <th>Agent</th>
-                  </tr>
-                </thead>
-                <tbody id="whitelisted-repos">
-                  <tr>
-                    <td><code>jodyswartz/launchpilot-dashboard</code></td>
-                    <td>Docs, dashboard UI, and GitHub Pages previews.</td>
-                    <td>LaunchPilot</td>
-                  </tr>
-                  <tr>
-                    <td><code>jodyswartz/sage-lab</code></td>
-                    <td>Labeled issue patches with owner review.</td>
-                    <td>S.A.G.E.</td>
-                  </tr>
-                  <tr>
-                    <td><code>jodyswartz/automation-playground</code></td>
-                    <td>Sandbox runs, test fixtures, and cleanup drills.</td>
-                    <td>Both</td>
-                  </tr>
-                </tbody>
-              </table>
-            </article>
-
-            <article class="table-card">
               <h3>Supported Labels</h3>
               <table>
                 <thead>
@@ -1319,6 +1339,15 @@
     <script>
       (() => {
         const DATA_URL = "https://raw.githubusercontent.com/jodyswartz/launchpilot-data/main/tasks.json";
+        const WHITELIST_FIELDS = [
+          "whitelistedRepos",
+          "whitelisted_repos",
+          "publicWhitelist",
+          "public_whitelist",
+          "allowedRepos",
+          "allowed_repos",
+          "repos",
+        ];
         const statusClass = (value = "") => {
           const text = String(value).toLowerCase();
           if (/(ready|running|building|merged|open|complete|archived|allowed|approved|success)/.test(text)) {
@@ -1364,6 +1393,9 @@
           const value = String(href || "#").trim();
           return /^(https?:\/\/|#|\.?\/)/.test(value) ? value : "#";
         };
+        const boolText = (value) => String(value).trim().toLowerCase();
+        const isTrue = (value) => value === true || boolText(value) === "true";
+        const isFalse = (value) => value === false || boolText(value) === "false";
         const timeValue = (value = "") => {
           const time = Date.parse(String(value).replace(" ", "T"));
           return Number.isNaN(time) ? 0 : time;
@@ -1511,6 +1543,55 @@
           if (/merged|complete|approved/.test(status)) return "ready";
           return "hold";
         };
+        const isRepoRecord = (value) => Boolean(value && typeof value === "object" && !Array.isArray(value) && (
+          value.repository || value.repo || value.name || value.fullName || value.full_name ||
+          value.repoName || value.repo_name || value.slug || value.github || value.githubUrl ||
+          value.github_url || value.html_url || value.website || value.websiteUrl ||
+          value.website_url || value.homepage || value.url || value.agent || value.agents ||
+          value.allowedWork || value.allowed_work || value.purpose || value.description ||
+          value.scope || value.visibility || "private" in value || "isPrivate" in value ||
+          "public" in value
+        ));
+        const normalizeRepoEntries = (value) => {
+          if (Array.isArray(value)) return value;
+          if (isRepoRecord(value)) return [value];
+          if (value && typeof value === "object") {
+            return Object.entries(value).map(([name, entry]) =>
+              entry && typeof entry === "object" && !Array.isArray(entry)
+                ? { repository: entry.repository ?? entry.repo ?? entry.name ?? name, ...entry }
+                : { repository: name, allowedWork: entry }
+            );
+          }
+          return value ? [value] : [];
+        };
+        const repoName = (repo) => {
+          const item = repo && typeof repo === "object" ? repo : { repository: repo ?? "" };
+          return item.repository ?? item.repo ?? item.name ?? item.fullName ?? item.full_name ??
+            item.repoName ?? item.repo_name ?? item.slug ?? "";
+        };
+        const isPrivateRepo = (repo) => {
+          if (!repo || typeof repo !== "object") return false;
+          return isTrue(repo.private) ||
+            isTrue(repo.isPrivate) ||
+            boolText(repo.visibility) === "private" ||
+            isFalse(repo.public);
+        };
+        const repoAgent = (repo) => {
+          const raw = repo.agent ?? repo.agents ?? repo.source ?? repo.owner ?? "";
+          const text = Array.isArray(raw) ? raw.join(" ") : String(raw);
+          const hasLaunchPilot = /launch\s*pilot|launchpilot/i.test(text);
+          const hasSage = /s\.?\s*a\.?\s*g\.?\s*e\.?|sage/i.test(text);
+          if (hasLaunchPilot && hasSage) return "Both";
+          if (hasLaunchPilot) return "LaunchPilot";
+          if (hasSage) return "S.A.G.E.";
+          return text.trim();
+        };
+        const repoAllowedWork = (repo) =>
+          repo.allowedWork ?? repo.allowed_work ?? repo.purpose ?? repo.description ??
+          repo.scope ?? repo.allowed ?? repo.work ?? "";
+        const repoLink = (repo) =>
+          repo.githubUrl ?? repo.github_url ?? repo.github ?? repo.html_url ??
+          repo.websiteUrl ?? repo.website_url ?? repo.website ?? repo.homepage ?? repo.url ?? "";
         const normalizeDashboard = (raw) => {
           const data = Array.isArray(raw) ? { tasks: raw } : { ...(raw || {}) };
           const tasks = asArray(data.tasks);
@@ -1665,17 +1746,21 @@
           `).join("") || emptyRows(3, "No cleanup queued."));
         };
 
-        const renderRepos = (repos) => {
-          setHTML("whitelisted-repos", asArray(repos).map((repo) => {
+        const renderPublicRepos = (repos) => {
+          const publicRepos = normalizeRepoEntries(repos).filter((repo) => repoName(repo) && !isPrivateRepo(repo));
+          setHTML("connected-public-repos", publicRepos.map((repo) => {
             const item = repo && typeof repo === "object" ? repo : { repository: repo ?? "" };
+            const agent = repoAgent(item);
+            const link = repoLink(item);
             return `
               <tr>
-                <td>${code(item.repository ?? item.repo ?? item.name ?? "")}</td>
-                <td>${escape(item.allowedWork ?? item.allowed_work ?? item.description ?? "")}</td>
-                <td>${escape(item.agent ?? "Both")}</td>
+                <td>${code(repoName(item))}</td>
+                <td>${agent ? chip(agent) : ""}</td>
+                <td>${escape(repoAllowedWork(item))}</td>
+                <td>${link ? `<a href="${escape(safeHref(link))}">${escape(/github\.com/i.test(link) ? "GitHub" : "Website")}</a>` : ""}</td>
               </tr>
             `;
-          }).join("") || emptyRows(3, "No repositories whitelisted."));
+          }).join("") || emptyRows(4, "No connected public repositories."));
         };
 
         const renderLabels = (labels) => {
@@ -1722,7 +1807,7 @@
             return response.json();
           })
           .then((data) => {
-            data = data.dashboard || data;
+            data = data.dashboard ? { ...data, ...data.dashboard } : data;
             data = normalizeDashboard(data);
             renderMetrics(data.metrics);
             renderRecentTasks(data.recentTasks);
@@ -1731,7 +1816,7 @@
             renderDeploymentLinks(data.deploymentLinks);
             renderLogs(data.latestLogs);
             renderCleanup(data.cleanupQueue);
-            renderIfPresent(data, ["whitelistedRepos", "whitelisted_repos", "repos"], renderRepos);
+            renderIfPresent(data, WHITELIST_FIELDS, renderPublicRepos);
             renderIfPresent(data, ["supportedLabels", "supported_labels", "labels"], renderLabels);
             renderCancelled(data.cancelledTasks);
             renderFailed(data.failedTasks);
